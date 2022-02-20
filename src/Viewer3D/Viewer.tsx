@@ -2,6 +2,7 @@ import React from "react";
 import { DirectionalLight, GridHelper, HemisphereLight, LinearEncoding, LogLuvEncoding, Mesh, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, SpotLight, sRGBEncoding, Vector3, WebGLRenderer } from "three";
 import { ModelManager } from "./ModelManager";
 import { character } from "./Scene/Models";
+import { myClassInstance } from "./Controls/Controls";
 import { TrackballControls } from './../lib/TrackballControls.js';
 
 export class Viewer extends React.Component {
@@ -9,10 +10,12 @@ export class Viewer extends React.Component {
  private _scene!: Scene;
  private _camera!: PerspectiveCamera;
  private _renderer!: WebGLRenderer;
- private _controls!: TrackballControls;
-
+ private _trackballControls!: TrackballControls;
 
  componentDidMount() {
+
+  myClassInstance.init();
+
   const modelManager = new ModelManager();
   modelManager.loadAndStoreModels();
 
@@ -20,25 +23,28 @@ export class Viewer extends React.Component {
   if (!canvas) {
    return;
   }
+
   this._scene = new Scene();
   this._scene.add(this._viewerPlane())
 
   this._addLights();
   this._camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.25, 5000);
-  this._camera.position.set(20, 20, 40);
+  this._camera.position.set(40, 40, 40);
   this._camera.lookAt(new Vector3(0, 0, 0));
   this._renderer = new WebGLRenderer({ canvas, antialias: true });
   this._renderer.setSize(window.innerWidth, window.innerHeight);
   this._renderer.setPixelRatio(window.devicePixelRatio);
+  this._renderer.outputEncoding = sRGBEncoding
   this._renderer.setClearColor(0x000000, 0);
   this._renderer.toneMappingExposure = Math.pow(1, 5.0); // to allow for very bright scenes.
   this._renderer.shadowMap.enabled = true;
-  this._controls = new TrackballControls(this._camera, this._renderer.domElement);
+  this._trackballControls = new TrackballControls(this._camera, this._renderer.domElement);
 
-  this._controls.rotateSpeed = 1.0;
-  this._controls.zoomSpeed = 1.2;
-  this._controls.panSpeed = 0.4;
-  this._controls.keys = ['KeyA', 'KeyS', 'KeyD'];
+
+  this._trackballControls.noRotate = true;
+  this._trackballControls.zoomSpeed = 1.2;
+  this._trackballControls.panSpeed = 0.4;
+  this._trackballControls.keys = ['KeyA', 'KeyS', 'KeyD'];
 
   this.animate();
   this.loadChar();
@@ -49,11 +55,11 @@ export class Viewer extends React.Component {
  }
 
  _addLights() {
-  const light = new HemisphereLight(0xddeeff, 0x0f0e0d, 0.8);
+  const light = new HemisphereLight(0xddeeff, 0x0f0e0d, 0.6);
 
   // const light = new PointLight(0xffffff, 1.6, 9000);
   light.position.set(20, 20, 40);
-  light.castShadow = true;
+  light.castShadow = false;
   this._scene.add(light);
 
   const light2 = new PointLight(0xffffff, 1, 10000, 0);
@@ -74,7 +80,8 @@ export class Viewer extends React.Component {
 
  animate() {
   requestAnimationFrame(this.animate.bind(this));
-  this._controls.update();
+  this._trackballControls.update();
+  console.log(this._camera.position.toArray())
   this._renderer.render(this._scene, this._camera);
  }
 

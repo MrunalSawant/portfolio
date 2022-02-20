@@ -1,4 +1,11 @@
-import { EventDispatcher, MOUSE, Quaternion, Vector2, Vector3 } from "three";
+import {
+  EventDispatcher,
+  MathUtils,
+  MOUSE,
+  Quaternion,
+  Vector2,
+  Vector3,
+} from "three";
 
 const _changeEvent = { type: "change" };
 const _startEvent = { type: "start" };
@@ -248,7 +255,13 @@ class TrackballControls extends EventDispatcher {
           mouseChange.multiplyScalar(_eye.length() * scope.panSpeed);
 
           pan.copy(_eye).cross(scope.object.up).setLength(mouseChange.x);
-          pan.add(objectUp.copy(scope.object.up).setLength(mouseChange.y));
+          pan.add(
+            _eye
+              .clone()
+              .cross(scope.object.up)
+              .applyAxisAngle(scope.object.up, MathUtils.degToRad(-90))
+              .setLength(mouseChange.y)
+          );
 
           scope.object.position.add(pan);
           scope.target.add(pan);
@@ -436,15 +449,15 @@ class TrackballControls extends EventDispatcher {
     function onMouseDown(event) {
       if (_state === STATE.NONE) {
         switch (event.button) {
-          case scope.mouseButtons.LEFT:
-            _state = STATE.ROTATE;
+          case scope.mouseButtons.RIGHT:
+            _state = STATE.PAN;
             break;
 
           case scope.mouseButtons.MIDDLE:
             _state = STATE.ZOOM;
             break;
 
-          case scope.mouseButtons.RIGHT:
+          case scope.mouseButtons.LEFT:
             _state = STATE.PAN;
             break;
 
