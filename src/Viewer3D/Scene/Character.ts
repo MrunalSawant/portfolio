@@ -59,7 +59,21 @@ class Character {
   }
 
   stopAct(key: string) {
-    console.log(key);
+    switch (key) {
+      case "KeyW":
+        if (characterInstance.activeAction) {
+          if (
+            characterInstance.activeAction ===
+            //@ts-ignore
+            characterInstance.actions["Running"]
+          ) {
+            characterInstance.activeAction.stop();
+            //@ts-ignore
+            characterInstance.activeAction = undefined;
+          }
+        }
+        break;
+    }
   }
 
   act(key: string) {
@@ -75,11 +89,18 @@ class Character {
         break;
 
       case "KeyW":
-        //@ts-ignore
-        characterInstance.activeAction = characterInstance.actions["Running"];
-        changeAction = true;
-        break;
+        if (
+          characterInstance.activeAction !=
+          //@ts-ignore
+          characterInstance.actions["Running"]
+        ) {
+          characterInstance.activeAction =
+            //@ts-ignore
+            characterInstance.actions["Running"];
+          changeAction = true;
+        }
 
+        break;
       case "Space":
         //@ts-ignore
         characterInstance.activeAction = characterInstance.actions["Jump"];
