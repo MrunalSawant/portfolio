@@ -1,10 +1,18 @@
+import { characterInstance } from "../Scene/Character";
+
 class Controls {
   private static _instance: Controls;
 
   public init() {
     console.log("Controls");
     document.onkeydown = function (event: KeyboardEvent) {
-      console.log(event.key);
+      characterInstance.act(event.code);
+
+      // event.preventDefault();
+    };
+
+    document.onkeyup = function (event: KeyboardEvent) {
+      characterInstance.stopAct(event.code);
 
       // event.preventDefault();
     };

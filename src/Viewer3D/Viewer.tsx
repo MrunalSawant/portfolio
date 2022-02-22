@@ -1,9 +1,9 @@
 import React from "react";
-import { DirectionalLight, GridHelper, HemisphereLight, LinearEncoding, LogLuvEncoding, Mesh, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, SpotLight, sRGBEncoding, Vector3, WebGLRenderer } from "three";
-import { ModelManager } from "./ModelManager";
-import { character } from "./Scene/Models";
+import { Clock, GridHelper, HemisphereLight, Mesh, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, sRGBEncoding, Vector3, WebGLRenderer } from "three";
+import { loadModel, ModelManager } from "./ModelManager";
 import { myClassInstance } from "./Controls/Controls";
 import { TrackballControls } from './../lib/TrackballControls.js';
+import { characterInstance } from "./Scene/Character";
 
 export class Viewer extends React.Component {
 
@@ -11,6 +11,7 @@ export class Viewer extends React.Component {
  private _camera!: PerspectiveCamera;
  private _renderer!: WebGLRenderer;
  private _trackballControls!: TrackballControls;
+ private _clock!: Clock;
 
  componentDidMount() {
 
@@ -24,13 +25,21 @@ export class Viewer extends React.Component {
    return;
   }
 
+  this._clock = new Clock();
+
   this._scene = new Scene();
   this._scene.add(this._viewerPlane())
+  const size = 1000;
+  const divisions = 1000;
+
+  const gridHelper = new GridHelper(size, divisions);
+  this._scene.add(gridHelper);
 
   this._addLights();
   this._camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.25, 5000);
-  this._camera.position.set(40, 40, 40);
+  this._camera.position.set(0, 20, 40);
   this._camera.lookAt(new Vector3(0, 0, 0));
+
   this._renderer = new WebGLRenderer({ canvas, antialias: true });
   this._renderer.setSize(window.innerWidth, window.innerHeight);
   this._renderer.setPixelRatio(window.devicePixelRatio);
@@ -45,30 +54,31 @@ export class Viewer extends React.Component {
   this._trackballControls.zoomSpeed = 1.2;
   this._trackballControls.panSpeed = 0.4;
   this._trackballControls.keys = ['KeyA', 'KeyS', 'KeyD'];
-
+  modelManager.loadChar(this._scene);
   this.animate();
-  this.loadChar();
  }
 
- loadChar() {
-  this._scene.add(character);
- }
 
  _addLights() {
-  const light = new HemisphereLight(0xddeeff, 0x0f0e0d, 0.6);
 
-  // const light = new PointLight(0xffffff, 1.6, 9000);
-  light.position.set(20, 20, 40);
+  const light = new HemisphereLight(0xddeeff, 0x0f0e0d, 0.5);
+  light.position.set(20, 20, 20);
   light.castShadow = false;
   this._scene.add(light);
 
-  const light2 = new PointLight(0xffffff, 1, 10000, 0);
-  light2.position.set(100, 100, 20);
+  const light2 = new PointLight(0xffffff, 2, 100000, 1);
+  light2.position.set(-800, 700, 800);
   light2.castShadow = true;
+  light2.shadow.mapSize.width = 4096;
+  light2.shadow.mapSize.height = 4096;
+  light2.shadow.radius = 1;
   this._scene.add(light2);
  }
 
  _viewerPlane(): Mesh {
+
+
+
   const mesh = new Mesh(
    new PlaneGeometry(2000, 2000),
    new MeshPhongMaterial({ color: 0x56ab2f, depthWrite: false })
@@ -79,9 +89,31 @@ export class Viewer extends React.Component {
  }
 
  animate() {
+
+  const dt = this._clock.getDelta();
+  if (characterInstance.mixer) characterInstance.mixer.update(dt);
+
+
+  if (characterInstance.activeAction) {
+
+   //@ts-ignore
+   if (characterInstance.activeAction.name === 'Walking'
+   ) {
+    let rotation = new Vector3(0, 0, 1);
+    rotation.applyEuler(characterInstance.model.rotation);
+    characterInstance.model.position.add(rotation.clone().multiplyScalar(dt * 2));
+    //@ts-ignore
+   } else if (characterInstance.activeAction.name === 'Running') {
+
+    let rotation = new Vector3(0, 0, 1);
+    rotation.applyEuler(characterInstance.model.rotation);
+    characterInstance.model.position.add(rotation.clone().multiplyScalar(dt * 4));
+   }
+
+  }
+
   requestAnimationFrame(this.animate.bind(this));
   this._trackballControls.update();
-  console.log(this._camera.position.toArray())
   this._renderer.render(this._scene, this._camera);
  }
 
@@ -89,3 +121,6 @@ export class Viewer extends React.Component {
   return <div style={{ backgroundImage: "linear-gradient(#56ab2f, #a8e063)" }}> <canvas id="viewer3d" /> </div>
  }
 }
+
+
+// POC for adding annotation in viewer and capturing it 

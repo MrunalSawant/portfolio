@@ -1,6 +1,5 @@
 import { Mesh, Scene } from "three";
 
-let character: Scene = new Scene();
 let woodBox: Mesh = new Mesh();
 let wineBox: Mesh = new Mesh();
 let treesTypeA: Array<Mesh> = [];
@@ -16,7 +15,6 @@ let leaf: Array<Mesh> = [];
 let barricades: Array<Mesh> = [];
 
 export {
-  character,
   woodBox,
   wineBox,
   treesTypeA,
