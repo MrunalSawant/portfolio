@@ -4,16 +4,22 @@ import {
   AnimationMixer,
   LoopOnce,
   Scene,
-  Vector3,
 } from "three";
+
+interface CharacterAction extends AnimationAction {
+  name: string;
+}
 
 class Character {
   private static _instance: Character;
   public model!: Scene;
   public mixer!: AnimationMixer;
-  public actions!: Object;
-  public activeAction!: AnimationAction;
-  public previousAction!: AnimationAction;
+  public actions: Map<string, CharacterAction> = new Map<
+    string,
+    CharacterAction
+  >();
+  public activeAction: CharacterAction | undefined;
+  public previousAction: CharacterAction | undefined;
   public duration = 0.5;
 
   public static get Instance() {
@@ -40,35 +46,32 @@ class Character {
 
     Character._instance.mixer = new AnimationMixer(model);
 
-    Character._instance.actions = {};
-
     for (let i = 0; i < animations.length; i++) {
       const clip = animations[i];
-      const action = Character._instance.mixer.clipAction(clip);
-      //@ts-ignore
+      const action = Character._instance.mixer.clipAction(
+        clip
+      ) as CharacterAction;
       action.name = clip.name;
-      //@ts-ignore
-      Character._instance.actions[clip.name] = action;
-
+      Character._instance.actions.set(clip.name, action);
       if (emotes.indexOf(clip.name) >= 0 || states.indexOf(clip.name) >= 4) {
         action.clampWhenFinished = true;
         action.loop = LoopOnce;
       }
     }
-    // Character._instance.act();
   }
 
-  stopAct(key: string) {
+  stopAct(key: string, shiftKey: boolean) {
     switch (key) {
+      // case "Shift":
+      //   console.log("only shift");
+      // characterInstance.model.rotateY(0.1);
+      // break;
       case "KeyW":
-        if (characterInstance.activeAction) {
-          if (
-            characterInstance.activeAction ===
-            //@ts-ignore
-            characterInstance.actions["Running"]
-          ) {
+        // const walkingAct = characterInstance.actions.get("Running");
+        const runningAct = characterInstance.actions.get("Running");
+        if (characterInstance.activeAction && runningAct) {
+          if (characterInstance.activeAction.name === runningAct!.name) {
             characterInstance.activeAction.stop();
-            //@ts-ignore
             characterInstance.activeAction = undefined;
           }
         }
@@ -76,64 +79,83 @@ class Character {
     }
   }
 
-  act(key: string) {
+  act(key: string, shiftKey: boolean) {
     let changeAction = false;
 
     switch (key) {
+      // case "ShiftRight":
+      // case "ShiftLeft":
+      //   console.log("only shift");
+      //   characterInstance.model.rotateY(0.1);
+      //   break;
+
       case "KeyD":
-        characterInstance.model.rotateY(0.2);
+        characterInstance.model.rotateY(0.1);
         break;
 
       case "KeyA":
-        characterInstance.model.rotateY(-0.2);
+        characterInstance.model.rotateY(-0.1);
         break;
 
       case "KeyW":
-        if (
-          characterInstance.activeAction !=
-          //@ts-ignore
-          characterInstance.actions["Running"]
+        const runningAct = characterInstance.actions.get("Running");
+        // const walkingAct = characterInstance.actions.get("Running");
+        // if (shiftKey) {
+        //   if (!characterInstance.activeAction) {
+        //     characterInstance.activeAction =
+        //       characterInstance.actions.get("Running");
+        //     changeAction = true;
+        //   } else if (
+        //     runningAct &&
+        //     characterInstance.activeAction.name !== runningAct.name
+        //   ) {
+        //     characterInstance.activeAction =
+        //       characterInstance.actions.get("Running");
+        //     changeAction = true;
+        //   }
+        // } else {
+        if (!characterInstance.activeAction) {
+          characterInstance.activeAction =
+            characterInstance.actions.get("Running");
+          changeAction = true;
+        } else if (
+          runningAct &&
+          characterInstance.activeAction.name !== runningAct.name
         ) {
           characterInstance.activeAction =
-            //@ts-ignore
-            characterInstance.actions["Running"];
+            characterInstance.actions.get("Running");
           changeAction = true;
         }
 
         break;
       case "Space":
-        //@ts-ignore
-        characterInstance.activeAction = characterInstance.actions["Jump"];
+        characterInstance.activeAction = characterInstance.actions.get("Jump");
         changeAction = true;
         break;
 
       case "KeyY":
-        //@ts-ignore
-        characterInstance.activeAction = characterInstance.actions["Yes"];
+        characterInstance.activeAction = characterInstance.actions.get("Yes");
         changeAction = true;
         break;
 
       case "KeyN":
-        //@ts-ignore
-        characterInstance.activeAction = characterInstance.actions["No"];
+        characterInstance.activeAction = characterInstance.actions.get("No");
         changeAction = true;
         break;
 
       case "KeyH":
-        //@ts-ignore
-        characterInstance.activeAction = characterInstance.actions["Wave"];
+        characterInstance.activeAction = characterInstance.actions.get("Wave");
         changeAction = true;
         break;
 
       case "KeyT":
-        //@ts-ignore
-        characterInstance.activeAction = characterInstance.actions["ThumbsUp"];
+        characterInstance.activeAction =
+          characterInstance.actions.get("ThumbsUp");
         changeAction = true;
         break;
 
       case "KeyP":
-        //@ts-ignore
-        characterInstance.activeAction = characterInstance.actions["Punch"];
+        characterInstance.activeAction = characterInstance.actions.get("Punch");
         changeAction = true;
         break;
     }
@@ -146,12 +168,13 @@ class Character {
         characterInstance.previousAction.fadeOut(characterInstance.duration);
       }
 
-      characterInstance.activeAction
-        .reset()
-        .setEffectiveTimeScale(1)
-        .setEffectiveWeight(1)
-        .fadeIn(0.2)
-        .play();
+      if (characterInstance.activeAction)
+        characterInstance.activeAction
+          .reset()
+          .setEffectiveTimeScale(1)
+          .setEffectiveWeight(1)
+          .fadeIn(0.2)
+          .play();
 
       characterInstance.previousAction = characterInstance.activeAction;
     }

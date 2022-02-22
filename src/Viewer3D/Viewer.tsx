@@ -1,6 +1,6 @@
 import React from "react";
 import { Clock, GridHelper, HemisphereLight, Mesh, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, sRGBEncoding, Vector3, WebGLRenderer } from "three";
-import { loadModel, ModelManager } from "./ModelManager";
+import { ModelManager } from "./ModelManager";
 import { myClassInstance } from "./Controls/Controls";
 import { TrackballControls } from './../lib/TrackballControls.js';
 import { characterInstance } from "./Scene/Character";
@@ -90,26 +90,15 @@ export class Viewer extends React.Component {
 
  animate() {
 
+  // Move character (if it want's to move)
   const dt = this._clock.getDelta();
   if (characterInstance.mixer) characterInstance.mixer.update(dt);
-
-
   if (characterInstance.activeAction) {
-
-   //@ts-ignore
-   if (characterInstance.activeAction.name === 'Walking'
-   ) {
+   if (characterInstance.activeAction.name === 'Running') {
     let rotation = new Vector3(0, 0, 1);
     rotation.applyEuler(characterInstance.model.rotation);
-    characterInstance.model.position.add(rotation.clone().multiplyScalar(dt * 2));
-    //@ts-ignore
-   } else if (characterInstance.activeAction.name === 'Running') {
-
-    let rotation = new Vector3(0, 0, 1);
-    rotation.applyEuler(characterInstance.model.rotation);
-    characterInstance.model.position.add(rotation.clone().multiplyScalar(dt * 4));
+    characterInstance.model.position.add(rotation.clone().multiplyScalar(dt * 6));
    }
-
   }
 
   requestAnimationFrame(this.animate.bind(this));
