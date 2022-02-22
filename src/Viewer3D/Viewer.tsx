@@ -76,9 +76,6 @@ export class Viewer extends React.Component {
  }
 
  _viewerPlane(): Mesh {
-
-
-
   const mesh = new Mesh(
    new PlaneGeometry(2000, 2000),
    new MeshPhongMaterial({ color: 0x56ab2f, depthWrite: false })
@@ -97,7 +94,13 @@ export class Viewer extends React.Component {
    if (characterInstance.activeAction.name === 'Running') {
     let rotation = new Vector3(0, 0, 1);
     rotation.applyEuler(characterInstance.model.rotation);
-    characterInstance.model.position.add(rotation.clone().multiplyScalar(dt * 6));
+    const movement = rotation.clone().multiplyScalar(dt * 6)
+    characterInstance.model.position.add(movement);
+    this._camera.position.add(movement);
+    this._camera.lookAt(characterInstance.model.position);
+    this._trackballControls.target.copy(characterInstance.model.position)
+    this._camera.updateMatrix();
+
    }
   }
 
