@@ -46,6 +46,8 @@ class TrackballControls extends EventDispatcher {
 
     this.rotateSpeed = 1.0;
     this.zoomSpeed = 1.2;
+    this.minZoomDistance = 30;
+    this.maxZoomDistance = 350;
     this.panSpeed = 0.3;
 
     this.noRotate = false;
@@ -193,6 +195,19 @@ class TrackballControls extends EventDispatcher {
 
     this.zoomCamera = function () {
       let factor;
+      const distance = scope.object.position.distanceTo(scope.target);
+
+      if (_zoomStart.y > 0) {
+        if (distance < scope.minZoomDistance) {
+          _zoomStart.y = 0;
+          return;
+        }
+      } else if (_zoomStart.y < 0) {
+        if (distance > scope.maxZoomDistance) {
+          _zoomStart.y = 0;
+          return;
+        }
+      }
 
       if (_state === STATE.TOUCH_ZOOM_PAN) {
         factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
