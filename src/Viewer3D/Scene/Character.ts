@@ -62,10 +62,6 @@ class Character {
 
   stopAct(key: string, shiftKey: boolean) {
     switch (key) {
-      // case "Shift":
-      //   console.log("only shift");
-      // characterInstance.model.rotateY(0.1);
-      // break;
       case "KeyW":
         // const walkingAct = characterInstance.actions.get("Running");
         const runningAct = characterInstance.actions.get("Running");
@@ -83,12 +79,6 @@ class Character {
     let changeAction = false;
 
     switch (key) {
-      // case "ShiftRight":
-      // case "ShiftLeft":
-      //   console.log("only shift");
-      //   characterInstance.model.rotateY(0.1);
-      //   break;
-
       case "KeyD":
         characterInstance.model.rotateY(0.1);
         break;
@@ -99,21 +89,6 @@ class Character {
 
       case "KeyW":
         const runningAct = characterInstance.actions.get("Running");
-        // const walkingAct = characterInstance.actions.get("Running");
-        // if (shiftKey) {
-        //   if (!characterInstance.activeAction) {
-        //     characterInstance.activeAction =
-        //       characterInstance.actions.get("Running");
-        //     changeAction = true;
-        //   } else if (
-        //     runningAct &&
-        //     characterInstance.activeAction.name !== runningAct.name
-        //   ) {
-        //     characterInstance.activeAction =
-        //       characterInstance.actions.get("Running");
-        //     changeAction = true;
-        //   }
-        // } else {
         if (!characterInstance.activeAction) {
           characterInstance.activeAction =
             characterInstance.actions.get("Running");

@@ -12,6 +12,7 @@ export class Viewer extends React.Component {
  private _renderer!: WebGLRenderer;
  private _trackballControls!: TrackballControls;
  private _clock!: Clock;
+ private _postionToTargetDirection!: Vector3;
 
  componentDidMount() {
 
@@ -33,12 +34,13 @@ export class Viewer extends React.Component {
   const divisions = 1000;
 
   const gridHelper = new GridHelper(size, divisions);
-  this._scene.add(gridHelper);
+  // this._scene.add(gridHelper);
 
   this._addLights();
   this._camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.25, 5000);
   this._camera.position.set(0, 20, 40);
   this._camera.lookAt(new Vector3(0, 0, 0));
+  this._postionToTargetDirection = this._camera.position.clone().sub(new Vector3(0, 0, 0)).normalize();
 
   this._renderer = new WebGLRenderer({ canvas, antialias: true });
   this._renderer.setSize(window.innerWidth, window.innerHeight);
@@ -66,7 +68,7 @@ export class Viewer extends React.Component {
   light.castShadow = false;
   this._scene.add(light);
 
-  const light2 = new PointLight(0xffffff, 2, 100000, 1);
+  const light2 = new PointLight(0xffffff, 1.5, 100000, 1);
   light2.position.set(-800, 700, 800);
   light2.castShadow = true;
   light2.shadow.mapSize.width = 4096;
@@ -96,7 +98,17 @@ export class Viewer extends React.Component {
     rotation.applyEuler(characterInstance.model.rotation);
     const movement = rotation.clone().multiplyScalar(dt * 6)
     characterInstance.model.position.add(movement);
-    this._camera.position.add(movement);
+
+    const distance = this._camera.position.distanceTo(this._trackballControls.target);
+    console.log("distance camera to postion" + distance);
+    console.log("Camera target" + characterInstance.model.position.toArray());
+    console.log("Camera Direction" + this._postionToTargetDirection.toArray());
+
+    const newCameraPostion = characterInstance.model.position.clone().add(this._postionToTargetDirection.clone().multiplyScalar(distance))
+
+    console.log("Camera Postion old " + this._camera.position.toArray());
+    console.log("Camera Postion new " + newCameraPostion.toArray());
+    this._camera.position.copy(newCameraPostion);
     this._camera.lookAt(characterInstance.model.position);
     this._trackballControls.target.copy(characterInstance.model.position)
     this._camera.updateMatrix();
