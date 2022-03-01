@@ -8,11 +8,10 @@ let treesTypeC: Array<Mesh> = [];
 let house: Array<Mesh> = [];
 let rocks: Array<Mesh> = [];
 let flowers: Array<Mesh> = [];
-let grass: Scene = new Scene();
-let grassFarm: Mesh = new Mesh();
-
+let grass: Mesh = new Mesh();
 let leaf: Array<Mesh> = [];
 let barricades: Array<Mesh> = [];
+let grassField: Scene = new Scene();
 
 export {
   woodBox,
@@ -26,4 +25,5 @@ export {
   leaf,
   barricades,
   grass,
+  grassField,
 };

@@ -2,14 +2,61 @@ import {
   BufferGeometry,
   Euler,
   InstancedMesh,
+  Light,
   Material,
   Matrix4,
+  Mesh,
   Quaternion,
   Scene,
   Vector3,
 } from "three";
+import { ModelManager } from "../ModelManager";
+import { characterInstance } from "./Character";
+import { createFloor } from "./Floor";
+import { createMainLight, createShadowLight } from "./Lights";
 
-export class SceneManager {
+class SceneManager {
+  private static _instance: SceneManager;
+  public floor!: Mesh;
+  public mainLight!: Light;
+  public shadowLight!: Light;
+  public character!: Mesh;
+
+  public static get Instance() {
+    if (this._instance) {
+      return this._instance;
+    }
+
+    this._instance = new this();
+    return this._instance;
+  }
+
+  setEventCallback() {
+    document.onkeydown = function (event: KeyboardEvent) {
+      characterInstance.act(event.code, event.shiftKey);
+    };
+
+    document.onkeyup = function (event: KeyboardEvent) {
+      characterInstance.stopAct(event.code, event.shiftKey);
+      event.preventDefault();
+    };
+
+    document.onmousedown = function (event: MouseEvent) {
+      // Punch on mouse click
+    };
+  }
+
+  async initScene() {
+    const modelManager = new ModelManager();
+    SceneManager.Instance.setEventCallback();
+    SceneManager.Instance.floor = createFloor();
+    SceneManager.Instance.mainLight = createMainLight();
+    SceneManager.Instance.shadowLight = createShadowLight();
+    await modelManager.loadAndStoreModels();
+  }
+
+  start() {}
+
   public makeInstanceOnXZPlane(
     geometry: BufferGeometry,
     material: Material | Material[],
@@ -32,6 +79,8 @@ export class SceneManager {
   }
 }
 
+export const sceneInstance = SceneManager.Instance;
+
 const xzMatrixOnPlane = (function () {
   const position = new Vector3();
   const rotation = new Euler();
@@ -45,7 +94,7 @@ const xzMatrixOnPlane = (function () {
     rotation.y = Math.random() * 2 * Math.PI;
     quaternion.setFromEuler(rotation);
     scale.x = scale.z = 0.05;
-    scale.y = 0.8;
+    scale.y = 0.9;
     matrix.compose(position, quaternion, scale);
   };
 })();

@@ -1,9 +1,9 @@
 import React from "react";
 import { Clock, GridHelper, HemisphereLight, Mesh, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, sRGBEncoding, Vector3, WebGLRenderer } from "three";
-import { ModelManager } from "./ModelManager";
-import { myClassInstance } from "./Controls/Controls";
 import { TrackballControls } from './../lib/TrackballControls.js';
 import { characterInstance } from "./Scene/Character";
+import { grassField } from "./Scene/Model";
+import { sceneInstance } from "./Scene/SceneManager";
 
 export class Viewer extends React.Component {
 
@@ -14,12 +14,7 @@ export class Viewer extends React.Component {
  private _clock!: Clock;
  private _postionToTargetDirection!: Vector3;
 
- componentDidMount() {
-
-  myClassInstance.init();
-
-  const modelManager = new ModelManager();
-  modelManager.loadAndStoreModels();
+ async componentDidMount() {
 
   const canvas = document.getElementById("viewer3d");
   if (!canvas) {
@@ -27,16 +22,7 @@ export class Viewer extends React.Component {
   }
 
   this._clock = new Clock();
-
   this._scene = new Scene();
-  this._scene.add(this._viewerPlane())
-  const size = 1000;
-  const divisions = 1000;
-
-  const gridHelper = new GridHelper(size, divisions);
-  // this._scene.add(gridHelper);
-
-  this._addLights();
   this._camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.25, 5000);
   this._camera.position.set(0, 25, 40);
   this._camera.lookAt(new Vector3(0, 0, 0));
@@ -56,35 +42,17 @@ export class Viewer extends React.Component {
   this._trackballControls.zoomSpeed = 1.2;
   this._trackballControls.panSpeed = 0.4;
   this._trackballControls.keys = ['KeyA', 'KeyS', 'KeyD'];
-  modelManager.loadChar(this._scene);
   this.animate();
- }
 
-
- _addLights() {
-
-  const light = new HemisphereLight(0xddeeff, 0x0f0e0d, 0.5);
-  light.position.set(20, 20, 20);
-  light.castShadow = false;
-  this._scene.add(light);
-
-  const light2 = new PointLight(0xffffff, 1.5, 100000, 1);
-  light2.position.set(-800, 700, 800);
-  light2.castShadow = true;
-  light2.shadow.mapSize.width = 4096;
-  light2.shadow.mapSize.height = 4096;
-  light2.shadow.radius = 1;
-  this._scene.add(light2);
- }
-
- _viewerPlane(): Mesh {
-  const mesh = new Mesh(
-   new PlaneGeometry(2000, 2000),
-   new MeshPhongMaterial({ color: 0x56ab2f, depthWrite: false })
-  );
-  mesh.receiveShadow = true;
-  mesh.rotation.x = -Math.PI / 2;
-  return mesh;
+  if (sceneInstance) {
+   await sceneInstance.initScene();
+   // sceneInstance.start();
+   this._scene.add(sceneInstance.floor);
+   this._scene.add(sceneInstance.mainLight);
+   this._scene.add(sceneInstance.shadowLight);
+   this._scene.add(characterInstance.model);
+   this._scene.add(grassField);
+  }
  }
 
  animate() {

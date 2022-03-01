@@ -1,9 +1,15 @@
-import { Object3D, Scene } from "three";
+import { AnimationClip, Mesh, Object3D, Scene } from "three";
 import { GLTFLoader } from "../lib/GLTFLoader";
-import { SceneManager } from "./Scene/SceneManager";
+import { sceneInstance } from "./Scene/SceneManager";
 import { characterInstance } from "./Scene/Character";
+import { grass, grassField } from "./Scene/Model";
 
 const loader = new GLTFLoader();
+
+export interface GLTF {
+  scene: Scene;
+  animations: Array<AnimationClip>;
+}
 
 export function loadModel(
   modelUrl: string,
@@ -15,49 +21,36 @@ export function loadModel(
 }
 
 export class ModelManager {
-  isCharacterLoaded = false;
-  sceneManager: SceneManager;
-
-  constructor() {
-    this.sceneManager = new SceneManager();
+  async loadAndStoreModels(): Promise<any> {
+    const model = await this.loadModelPromise("models/character.glb");
+    await this.loadGras();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    characterInstance.init(model.scene);
+    characterInstance.loadAnimation(model.animations);
+    return;
   }
 
-  loadAndStoreModels() {
-    // this.loadGrass();
-  }
-
-  public loadChar(scene: Scene) {
-    loadModel(
-      "models/character.glb",
-      (gltf: { scene: Scene; animations: any }) => {
-        gltf.scene.traverse(function (object: Object3D) {
-          //@ts-ignore
-          if (object.isMesh) {
-            object.castShadow = true;
-          }
-        });
-        scene.add(gltf.scene);
-        this.isCharacterLoaded = true;
-        characterInstance.init(gltf.scene);
-        characterInstance.loadAnimation(gltf.animations);
-      }
-    );
-  }
-
-  loadGrass() {
-    loadModel("models/forest/grass1.glb", (gltf: { scene: Scene }) => {
-      //   this.onModelLoad(gltf, character);
-      this.isCharacterLoaded = true;
+  public loadModelPromise(modelUrl: string): Promise<GLTF> {
+    return new Promise(function (resolve, reject) {
+      loadModel(
+        modelUrl,
+        (gltf: { scene: Scene; animations: any }) => {
+          resolve(gltf);
+        },
+        () => {},
+        (error: any) => {
+          reject(error);
+        }
+      );
     });
   }
 
-  // onModelLoad(gltf: { scene: Scene }, scene: Scene) {
-  //   // HACK We know that wer have only one child for each mesh so we will load 0th object every time.
-  //   // mesh.copy(gltf.scene.children[0] as Mesh);
-  //   const geometry = (gltf.scene.children[0] as Mesh).geometry;
-  //   const material = (gltf.scene.children[0] as Mesh).material;
-  //   this.sceneManager.makeInstanceOnXZPlane(geometry, material, 15, scene);
-  // }
+  async loadGras() {
+    const gltf = await this.loadModelPromise("models/forest/grass1.glb");
+    const geometry = (gltf.scene.children[0] as Mesh).geometry;
+    const material = (gltf.scene.children[0] as Mesh).material;
+    sceneInstance.makeInstanceOnXZPlane(geometry, material, 15, grassField);
+  }
 
   createEnv() {}
 }
