@@ -23,7 +23,7 @@ export function loadModel(
 export class ModelManager {
   async loadAndStoreModels(): Promise<any> {
     const model = await this.loadModelPromise("models/character.glb");
-    await this.loadGras();
+    //  await this.loadGras();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     characterInstance.init(model.scene);
     characterInstance.loadAnimation(model.animations);

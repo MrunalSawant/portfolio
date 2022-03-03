@@ -29,6 +29,8 @@ class Character {
 
   public init(model: Scene) {
     Character._instance.model = model;
+    // HACK to move char to camera center
+    Character._instance.model.children[0].translateY(-2);
   }
 
   public loadAnimation(animations: Array<AnimationClip>) {
@@ -75,6 +77,10 @@ class Character {
     }
   }
 
+  public sayHello() {
+    this.act("KeyH", false);
+  }
+
   act(key: string, shiftKey: boolean) {
     let changeAction = false;
 
@@ -85,6 +91,22 @@ class Character {
 
       case "KeyA":
         characterInstance.model.rotateY(-0.1);
+        break;
+      case "KeyS":
+        const sittingAct = characterInstance.actions.get("Sitting");
+        if (!characterInstance.activeAction) {
+          characterInstance.activeAction =
+            characterInstance.actions.get("Sitting");
+          changeAction = true;
+        } else if (
+          sittingAct &&
+          characterInstance.activeAction.name !== sittingAct.name
+        ) {
+          characterInstance.activeAction =
+            characterInstance.actions.get("Sitting");
+          changeAction = true;
+        }
+
         break;
 
       case "KeyW":
@@ -120,6 +142,11 @@ class Character {
 
       case "KeyH":
         characterInstance.activeAction = characterInstance.actions.get("Wave");
+        changeAction = true;
+        break;
+
+      case "KeyK":
+        characterInstance.activeAction = characterInstance.actions.get("Death");
         changeAction = true;
         break;
 
