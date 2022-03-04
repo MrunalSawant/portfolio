@@ -1,8 +1,8 @@
-import { AnimationClip, Mesh, Object3D, Scene } from "three";
+import { AnimationClip, Mesh, Scene } from "three";
 import { GLTFLoader } from "../lib/GLTFLoader";
 import { sceneInstance } from "./Scene/SceneManager";
 import { characterInstance } from "./Scene/Character";
-import { grass, grassField } from "./Scene/Model";
+import { grassField } from "./Scene/Model";
 
 const loader = new GLTFLoader();
 

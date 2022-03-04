@@ -1,22 +1,19 @@
 import React from "react";
-import { Clock, GridHelper, HemisphereLight, Mesh, MeshPhongMaterial, PerspectiveCamera, PlaneGeometry, PointLight, Scene, sRGBEncoding, Vector3, WebGLRenderer } from "three";
+import { Clock, PerspectiveCamera, Scene, sRGBEncoding, Vector3, WebGLRenderer } from "three";
 import { TrackballControls } from './../lib/TrackballControls.js';
+import Controller from "./Controller/Controller";
 import { characterInstance } from "./Scene/Character";
 import { grassField } from "./Scene/Model";
 import { sceneInstance } from "./Scene/SceneManager";
-import "./Viewer.css"
+import "./Viewer.scss"
 
 type ViewerState = {
   isSceneReady: boolean,
   isStarted: boolean,
 };
-
-
 export class Viewer extends React.Component {
 
   state: ViewerState = { isSceneReady: false, isStarted: false, };
-
-
 
   private _scene!: Scene;
   private _camera!: PerspectiveCamera;
@@ -34,6 +31,7 @@ export class Viewer extends React.Component {
 
     this._clock = new Clock();
     this._scene = new Scene();
+
     this._camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.25, 5000);
     this._camera.position.set(0, 12.5, 20);
     this._camera.lookAt(new Vector3(0, 0, 0));
@@ -57,12 +55,10 @@ export class Viewer extends React.Component {
     if (sceneInstance) {
       await sceneInstance.initScene();
       this.setState({ isSceneReady: true })
-
-      // sceneInstance.start();
-      // this._scene.add(sceneInstance.floor);
-
     }
   }
+
+
 
   animate() {
 
@@ -91,7 +87,8 @@ export class Viewer extends React.Component {
     this._renderer.render(this._scene, this._camera);
   }
 
-  start() {
+
+  onStartClick() {
     this.setState({ isStarted: true })
     this._scene.add(sceneInstance.mainLight);
     this._scene.add(sceneInstance.shadowLight);
@@ -102,29 +99,7 @@ export class Viewer extends React.Component {
 
   render() {
     return <div>
-      <div className="overlay-container">
-        {!this.state.isSceneReady ? (
-          <div className="start-container">
-            <div id="loading">
-              <h1 className="loader">
-                <span>L</span><span>O</span><span>A</span><span>D</span><span>I</span><span>N</span><span>G</span>
-              </h1>
-            </div>
-          </div>)
-          : (
-            <div className="start-container">{
-              !this.state.isStarted ? (
-                <div >
-                  <button className="start-button" onClick={this.start.bind(this)}>
-                    <svg width="100" height="100" viewBox="0 0 384 512">
-                      <path d="M361 215C375.3 223.8 384 239.3 384 256C384 272.7 375.3 288.2 361 296.1L73.03 472.1C58.21 482 39.66 482.4 24.52 473.9C9.377 465.4 0 449.4 0 432V80C0 62.64 9.377 46.63 24.52 38.13C39.66 29.64 58.21 29.99 73.03 39.04L361 215z" />
-                    </svg>
-                  </button>
-                </div>) : <></>}
-            </div>
-          )
-        }
-      </div>
+      <Controller isStarted={this.state.isStarted} isSceneReady={this.state.isSceneReady} onStartClick={this.onStartClick.bind(this)} />
       <div className="viewer-container" >
         <canvas id="viewer3d" />
       </div>

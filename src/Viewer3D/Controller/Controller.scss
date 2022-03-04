@@ -8,7 +8,7 @@ h1.loader {
 }
 
 .loader span {
-  text-shadow: 0 0 2px rgba(255, 255, 255, 0.9), 0 15px 25px rgba(0, 0, 0, 0.3),
+  text-shadow: 0 0 2px rgba(17, 10, 10, 0.9), 0 15px 25px rgba(0, 0, 0, 0.3),
     0 -2px 3px rgba(0, 0, 0, 0.1), 0 -5px 10px rgba(255, 255, 255, 0.5),
     0 5px 10px rgba(0, 0, 0, 0.3), 0 3px 4px rgba(255, 255, 255, 0.2),
     0 0 20px rgba(255, 255, 255, 0.45);
@@ -49,8 +49,16 @@ h1.loader {
   animation-delay: 0.9s;
 }
 
-.viewer-container {
-  background-image: linear-gradient(rgb(42 175 255 / 80%), rgb(59 190 75));
+.svg {
+  fill: rgb(255, 255, 255);
+}
+
+svg:hover {
+  fill: rgb(200, 200, 200);
+}
+
+svg:active {
+  fill: rgb(129, 129, 129);
 }
 
 .overlay-container {
@@ -61,7 +69,7 @@ h1.loader {
 }
 
 .start-container {
-  pointer-events: all;
+  pointer-events: none;
   position: relative;
   color: white;
   top: 50%;
@@ -70,18 +78,54 @@ h1.loader {
 }
 
 .start-button {
+  pointer-events: all;
   border: none;
   background: transparent;
 }
 
-svg {
-  fill: rgb(255, 255, 255);
-  width: 100px;
-}
-svg:hover {
-  fill: rgb(200, 200, 200);
+.control-button-container {
+  position: absolute;
+  bottom: 8px;
+  width: 125px;
+  height: 125px;
 }
 
-svg:active {
-  fill: rgb(129, 129, 129);
+.control-button-container-right {
+  @extend .control-button-container;
+  right: 8px;
+}
+
+.control-button-container-left {
+  @extend .control-button-container;
+  left: 8px;
+}
+
+.control-button {
+  @extend .start-button;
+  color: #373737;
+  font-size: 25px;
+  font-family: cursive;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 30px;
+  background: white;
+  box-shadow: 0px 0px 12px 1px #575757;
+}
+
+.drag-button {
+  @extend .control-button;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+
+.control-button:active {
+  color: black;
+  background: rgb(206, 206, 206);
+}
+
+.svg-container {
+  width: 20px;
+  height: 20px;
 }
