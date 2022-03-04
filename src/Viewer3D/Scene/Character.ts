@@ -30,7 +30,7 @@ class Character {
   public init(model: Scene) {
     Character._instance.model = model;
     // HACK to move char to camera center
-    Character._instance.model.children[0].translateY(-2);
+    // Character._instance.model.children[0].translateY(-2);
   }
 
   public loadAnimation(animations: Array<AnimationClip>) {

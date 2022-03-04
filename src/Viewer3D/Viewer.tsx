@@ -5,6 +5,7 @@ import Controller from "./Controller/Controller";
 import { characterInstance } from "./Scene/Character";
 import { grassField } from "./Scene/Model";
 import { sceneInstance } from "./Scene/SceneManager";
+import { shadowInstance } from "./Scene/Shadow";
 import "./Viewer.scss"
 
 type ViewerState = {
@@ -54,6 +55,8 @@ export class Viewer extends React.Component {
 
     if (sceneInstance) {
       await sceneInstance.initScene();
+      await shadowInstance.init();
+
       this.setState({ isSceneReady: true })
     }
   }
@@ -78,8 +81,27 @@ export class Viewer extends React.Component {
         this._camera.lookAt(characterInstance.model.position);
         this._trackballControls.target.copy(characterInstance.model.position)
         this._camera.updateMatrix();
-
       }
+    }
+
+
+    if (shadowInstance.depthMaterial) {
+      this._scene.overrideMaterial = shadowInstance.depthMaterial;
+
+      // render to the render target to get the depths
+      this._renderer.setRenderTarget(shadowInstance.renderTarget);
+      this._renderer.render(this._scene, shadowInstance.shadowCamera);
+
+      // and reset the override material
+      this._scene.overrideMaterial = null;
+      shadowInstance.blurShadow(1, this._renderer);
+
+      // a second pass to reduce the artifacts
+      // (0.4 is the minimum blur amout so that the artifacts are gone)
+      shadowInstance.blurShadow(0.4, this._renderer);
+
+      // reset and render the normal scene
+      this._renderer.setRenderTarget(null);
     }
 
     requestAnimationFrame(this.animate.bind(this));
@@ -95,6 +117,7 @@ export class Viewer extends React.Component {
     this._scene.add(characterInstance.model);
     characterInstance.sayHello();
     this._scene.add(grassField);
+    this._scene.add(shadowInstance.shadowGroup);
   }
 
   render() {
