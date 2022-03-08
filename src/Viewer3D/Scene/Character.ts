@@ -29,6 +29,7 @@ class Character {
 
   public init(model: Scene) {
     Character._instance.model = model;
+    Character._instance.model.scale.set(0.5, 0.5, 0.5);
     // HACK to move char to camera center
     // Character._instance.model.children[0].translateY(-2);
   }
@@ -74,6 +75,16 @@ class Character {
           }
         }
         break;
+
+      case "KeyS":
+        const walkingAct = characterInstance.actions.get("Walking");
+        if (characterInstance.activeAction && walkingAct) {
+          if (characterInstance.activeAction.name === walkingAct!.name) {
+            characterInstance.activeAction.stop();
+            characterInstance.activeAction = undefined;
+          }
+        }
+        break;
     }
   }
 
@@ -93,17 +104,17 @@ class Character {
         characterInstance.model.rotateY(-0.1);
         break;
       case "KeyS":
-        const sittingAct = characterInstance.actions.get("Sitting");
+        const sittingAct = characterInstance.actions.get("Walking");
         if (!characterInstance.activeAction) {
           characterInstance.activeAction =
-            characterInstance.actions.get("Sitting");
+            characterInstance.actions.get("Walking");
           changeAction = true;
         } else if (
           sittingAct &&
           characterInstance.activeAction.name !== sittingAct.name
         ) {
           characterInstance.activeAction =
-            characterInstance.actions.get("Sitting");
+            characterInstance.actions.get("Walking");
           changeAction = true;
         }
 

@@ -3,10 +3,7 @@ import {
   Mesh,
   MeshBasicMaterial,
   MeshDepthMaterial,
-  MeshPhongMaterial,
   OrthographicCamera,
-  Plane,
-  PlaneBufferGeometry,
   PlaneGeometry,
   ShaderMaterial,
   WebGLRenderer,
@@ -42,8 +39,8 @@ class Shadow {
     Shadow._instance.renderTargetBlur = new WebGLRenderTarget(512, 512);
     Shadow._instance.renderTargetBlur.texture.generateMipmaps = false;
 
-    const PLANE_WIDTH = 50;
-    const PLANE_HEIGHT = 50;
+    const PLANE_WIDTH = 120;
+    const PLANE_HEIGHT = 100;
     const CAMERA_HEIGHT = 4;
 
     const planeGeometry = new PlaneGeometry(PLANE_WIDTH, PLANE_HEIGHT).rotateX(
@@ -51,7 +48,7 @@ class Shadow {
     );
     const planeMaterial = new MeshBasicMaterial({
       map: Shadow._instance.renderTarget.texture,
-      opacity: 0.7,
+      opacity: 0.6,
       transparent: true,
       depthWrite: false,
     });

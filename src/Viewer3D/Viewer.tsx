@@ -34,7 +34,7 @@ export class Viewer extends React.Component {
     this._scene = new Scene();
 
     this._camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.25, 5000);
-    this._camera.position.set(0, 12.5, 20);
+    this._camera.position.set(0, 4.75, 5);
     this._camera.lookAt(new Vector3(0, 0, 0));
     this._postionToTargetDirection = this._camera.position.clone().sub(new Vector3(0, 0, 0)).normalize();
 
@@ -54,8 +54,8 @@ export class Viewer extends React.Component {
     this.animate();
 
     if (sceneInstance) {
-      await sceneInstance.initScene();
-      await shadowInstance.init();
+      await sceneInstance.initScene(this._scene);
+
 
       this.setState({ isSceneReady: true })
     }
@@ -74,7 +74,20 @@ export class Viewer extends React.Component {
         rotation.applyEuler(characterInstance.model.rotation);
         const movement = rotation.clone().multiplyScalar(dt * 6)
         characterInstance.model.position.add(movement);
+        shadowInstance.shadowGroup.position.add(movement);
+        const distance = this._camera.position.distanceTo(this._trackballControls.target);
+        const newCameraPostion = characterInstance.model.position.clone().add(this._postionToTargetDirection.clone().multiplyScalar(distance))
+        this._camera.position.copy(newCameraPostion);
+        this._camera.lookAt(characterInstance.model.position);
+        this._trackballControls.target.copy(characterInstance.model.position)
+        this._camera.updateMatrix();
+      }
 
+      if (characterInstance.activeAction.name === 'Walking') {
+        let rotation = new Vector3(0, 0, 1);
+        rotation.applyEuler(characterInstance.model.rotation);
+        const movement = rotation.clone().multiplyScalar(dt * -3)
+        characterInstance.model.position.add(movement);
         const distance = this._camera.position.distanceTo(this._trackballControls.target);
         const newCameraPostion = characterInstance.model.position.clone().add(this._postionToTargetDirection.clone().multiplyScalar(distance))
         this._camera.position.copy(newCameraPostion);
@@ -94,7 +107,7 @@ export class Viewer extends React.Component {
 
       // and reset the override material
       this._scene.overrideMaterial = null;
-      shadowInstance.blurShadow(1, this._renderer);
+      shadowInstance.blurShadow(0.2, this._renderer);
 
       // a second pass to reduce the artifacts
       // (0.4 is the minimum blur amout so that the artifacts are gone)
@@ -112,12 +125,7 @@ export class Viewer extends React.Component {
 
   onStartClick() {
     this.setState({ isStarted: true })
-    this._scene.add(sceneInstance.mainLight);
-    this._scene.add(sceneInstance.shadowLight);
-    this._scene.add(characterInstance.model);
-    characterInstance.sayHello();
-    this._scene.add(grassField);
-    this._scene.add(shadowInstance.shadowGroup);
+    sceneInstance.start();
   }
 
   render() {
