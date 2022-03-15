@@ -1,4 +1,5 @@
 import React from "react";
+import { default as AmmoInit } from './../lib/ammo';
 import { Clock, PerspectiveCamera, Scene, sRGBEncoding, Vector3, WebGLRenderer } from "three";
 import { TrackballControls } from './../lib/TrackballControls.js';
 import Controller from "./Controller/Controller";
@@ -24,6 +25,12 @@ export class Viewer extends React.Component {
   private _postionToTargetDirection!: Vector3;
 
   async componentDidMount() {
+    var self = this;
+    AmmoInit().then(function (AmmoLib) {
+      console.log("AmmoLib");
+      sceneInstance.Ammo = AmmoLib;
+      // this.initPhysics();
+    });
 
     const canvas = document.getElementById("viewer3d");
     if (!canvas) {
@@ -98,24 +105,24 @@ export class Viewer extends React.Component {
     }
 
 
-    if (shadowInstance.depthMaterial) {
-      this._scene.overrideMaterial = shadowInstance.depthMaterial;
+    // if (shadowInstance.depthMaterial) {
+    //   this._scene.overrideMaterial = shadowInstance.depthMaterial;
 
-      // render to the render target to get the depths
-      this._renderer.setRenderTarget(shadowInstance.renderTarget);
-      this._renderer.render(this._scene, shadowInstance.shadowCamera);
+    //   // render to the render target to get the depths
+    //   this._renderer.setRenderTarget(shadowInstance.renderTarget);
+    //   this._renderer.render(this._scene, shadowInstance.shadowCamera);
 
-      // and reset the override material
-      this._scene.overrideMaterial = null;
-      shadowInstance.blurShadow(0.2, this._renderer);
+    //   // and reset the override material
+    //   this._scene.overrideMaterial = null;
+    //   shadowInstance.blurShadow(0.2, this._renderer);
 
-      // a second pass to reduce the artifacts
-      // (0.4 is the minimum blur amout so that the artifacts are gone)
-      shadowInstance.blurShadow(0.4, this._renderer);
+    //   // a second pass to reduce the artifacts
+    //   // (0.4 is the minimum blur amout so that the artifacts are gone)
+    //   shadowInstance.blurShadow(0.4, this._renderer);
 
-      // reset and render the normal scene
-      this._renderer.setRenderTarget(null);
-    }
+    //   // reset and render the normal scene
+    //   this._renderer.setRenderTarget(null);
+    // }
 
     requestAnimationFrame(this.animate.bind(this));
     this._trackballControls.update();

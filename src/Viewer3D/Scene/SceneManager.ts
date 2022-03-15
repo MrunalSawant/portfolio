@@ -24,6 +24,7 @@ class SceneManager {
   public character!: Mesh;
   public modelMap: Map<string, Scene> = new Map();
   public grasField: Scene = new Scene();
+  public Ammo: any;
 
   public static get Instance() {
     if (this._instance) {
@@ -31,8 +32,40 @@ class SceneManager {
     }
 
     this._instance = new this();
+
     return this._instance;
   }
+
+  // private initPhysics() {
+  //   // Physics configuration
+
+  //   this.collisionConfiguration =
+  //     new sceneInstance.Ammo.btDefaultCollisionConfiguration();
+  //   this.dispatcher = new sceneInstance.Ammo.btCollisionDispatcher(
+  //     this.collisionConfiguration
+  //   );
+  //   this.broadphase = new sceneInstance.Ammo.btDbvtBroadphase();
+  //   this.solver = new sceneInstance.Ammo.btSequentialImpulseConstraintSolver();
+  //   this.softBodySolver = new sceneInstance.Ammo.btDefaultSoftBodySolver();
+  //   this.physicsWorld = new sceneInstance.Ammo.btDiscreteDynamicsWorld(
+  //     this.dispatcher,
+  //     this.broadphase,
+  //     this.solver,
+  //     this.collisionConfiguration
+  //   );
+  //   this.physicsWorld.setGravity(
+  //     new sceneInstance.Ammo.btVector3(0, -this.gravityConstant, 0)
+  //   );
+  //   this.physicsWorld
+  //     .getWorldInfo()
+  //     .set_m_gravity(
+  //       new sceneInstance.Ammo.btVector3(0, this.gravityConstant, 0)
+  //     );
+  //   this.transformAux1 = new sceneInstance.Ammo.btTransform();
+
+  //   // this.transformAux1 = new this.Ammo.btTransform();
+  //   // tempBtVec3_1 = new this.Ammo.btVector3(0, 0, 0);
+  // }
 
   setEventCallback() {
     document.onkeydown = function (event: KeyboardEvent) {
@@ -59,25 +92,34 @@ class SceneManager {
     await modelManager.loadAndStoreModels();
   }
 
+  async physics() {}
+
   start() {
     this._scene.add(sceneInstance.mainLight);
     this._scene.add(sceneInstance.shadowLight);
     this._scene.add(characterInstance.model);
     characterInstance.sayHello();
+    sceneInstance.modelMap.forEach((scene: Scene, key: string) => {
+      sceneInstance.setRandomPosition(scene);
+      this._scene.add(scene);
+    });
     //this.loadGrass(this.grasField);
     // this.addRoad();
 
-    const house1 = sceneInstance.modelMap.get("house1");
-    if (house1) {
-      house1.position.z = -10;
-      //sceneInstance.setRandomPosition(house1);
-      this._scene.add(house1);
-    }
-    const house2 = sceneInstance.modelMap.get("treeh1");
-    if (house2) {
-      sceneInstance.setRandomPosition(house2);
-      this._scene.add(house2);
-    }
+    // const house1 = sceneInstance.modelMap.get("house1");
+    // if (house1) {
+    //   house1.castShadow = false;
+    //   house1.receiveShadow = false;
+    //   house1.position.z = -10;
+    //   //sceneInstance.setRandomPosition(house1);
+    //   this._scene.add(house1);
+    // }
+    // const house2 = sceneInstance.modelMap.get("treeh1");
+    // if (house2) {
+    //   house1.castShadow = false;
+    //   sceneInstance.setRandomPosition(house2);
+    //   this._scene.add(house2);
+    // }
     this._scene.add(shadowInstance.shadowGroup);
   }
 
@@ -132,8 +174,8 @@ class SceneManager {
   }
 
   setRandomPosition(scene: Scene) {
-    scene.position.x = Math.random() * 100;
-    scene.position.z = Math.random() * 100;
+    scene.position.x = 10 + Math.random() * 100;
+    scene.position.z = 10 + Math.random() * 100;
   }
 
   public makeInstanceOnStraightLine(
@@ -196,8 +238,8 @@ class SceneManager {
   ) {
     const matrix = new Matrix4();
     const mesh = new InstancedMesh(geometry, material, count * count);
-    mesh.receiveShadow = true;
-    mesh.castShadow = true;
+    mesh.receiveShadow = false;
+    mesh.castShadow = false;
 
     const position = new Vector3();
     const rotation = new Euler();
