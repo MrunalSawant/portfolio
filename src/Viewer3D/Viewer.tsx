@@ -1,5 +1,4 @@
 import React from "react";
-import { default as AmmoInit } from './../lib/ammo';
 import { Clock, PerspectiveCamera, Scene, sRGBEncoding, Vector3, WebGLRenderer } from "three";
 import { TrackballControls } from './../lib/TrackballControls.js';
 import Controller from "./Controller/Controller";
@@ -25,23 +24,33 @@ export class Viewer extends React.Component {
   private _postionToTargetDirection!: Vector3;
 
   async componentDidMount() {
-    var self = this;
-    AmmoInit().then(function (AmmoLib) {
-      console.log("AmmoLib");
-      sceneInstance.Ammo = AmmoLib;
-      // this.initPhysics();
-    });
 
     const canvas = document.getElementById("viewer3d");
     if (!canvas) {
       return;
     }
 
+    canvas.addEventListener("mousemove", (event) => {
+      //@ts-ignore
+      const adjustedMouseX = event.clientX - event.target.width / 2;
+      //@ts-ignore
+      const adjustedMouseY = -event.clientY + event.target.height / 2;
+      if (characterInstance)
+        characterInstance.setCharLookAtDirection(adjustedMouseX, adjustedMouseY);
+    })
+
+    canvas.addEventListener("mousedown", (event: MouseEvent) => {
+
+      if (characterInstance && event.button === 0)
+        characterInstance.act("KeyP", false);
+
+    })
+
     this._clock = new Clock();
     this._scene = new Scene();
 
     this._camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.25, 5000);
-    this._camera.position.set(0, 4.75, 5);
+    this._camera.position.set(0, 9.5, 10);
     this._camera.lookAt(new Vector3(0, 0, 0));
     this._postionToTargetDirection = this._camera.position.clone().sub(new Vector3(0, 0, 0)).normalize();
 

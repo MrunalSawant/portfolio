@@ -472,9 +472,9 @@ class TrackballControls extends EventDispatcher {
             _state = STATE.ZOOM;
             break;
 
-          case scope.mouseButtons.LEFT:
-            _state = STATE.PAN;
-            break;
+          // case scope.mouseButtons.LEFT:
+          //   _state = STATE.PAN;
+          //   break;
 
           default:
             _state = STATE.NONE;

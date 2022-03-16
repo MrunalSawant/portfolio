@@ -2963,6 +2963,8 @@ class GLTFParser {
             EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS
           ].createMaterial(materialParams);
       } else {
+        delete materialParams.format; // To remove Runtime warning due to property mismatches.
+
         material = new materialType(materialParams);
       }
 

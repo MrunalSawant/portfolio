@@ -1,13 +1,13 @@
 import { MouseEvent, ReactElement } from "react";
 import { characterInstance } from "../Scene/Character";
 import { MobileView } from 'react-device-detect';
+import { Joystick } from 'react-joystick-component';
 import "./Controller.scss"
 
 
 function Controller(props: { isStarted: boolean, isSceneReady: boolean, onStartClick: any }): ReactElement {
 
   let act: string | undefined = undefined;
-  let timeOut: NodeJS.Timeout | undefined = undefined;
 
   const continuousAct = function () {
     if (act)
@@ -18,25 +18,13 @@ function Controller(props: { isStarted: boolean, isSceneReady: boolean, onStartC
     characterInstance.act(key, false);
   }
 
-  const onControlStart = function (event: any, key: string) {
-    // For rotate only
-    if (key === "KeyA" || key === "KeyD") {
-      act = key;
-      timeOut = setInterval(continuousAct, 100);
-    } else {
-      characterInstance.act(key, false);
-    }
+  const onControlStart = function (event: any) {
+    characterInstance.setCharLookAtDirection(event.x, event.y);
+    characterInstance.act("KeyW", false);
   }
 
-  const onControlEnd = function (event: any, key: string) {
-    // For rotate only
-    if (key === "KeyA" || key === "KeyD") {
-      if (timeOut) {
-        clearTimeout(timeOut);
-      }
-    } else {
-      characterInstance.stopAct(key, false);
-    }
+  const onControlEnd = function (event: any) {
+    characterInstance.stopAct("KeyW", false);
   }
 
   return (
@@ -63,38 +51,30 @@ function Controller(props: { isStarted: boolean, isSceneReady: boolean, onStartC
                 <MobileView>
                   <div>
                     <div className="control-button-container-right">
-                      <button className="control-button" onClick={(event: MouseEvent | TouchEvent) => onControlClick(event, "Space")}>J</button><br />
-                      <button className="control-button" onClick={(event: MouseEvent | TouchEvent) => onControlClick(event, "KeyY")} style={{ marginRight: "40px" }} >Y</button>
-                      <button className="control-button" onClick={(event: MouseEvent | TouchEvent) => onControlClick(event, "KeyN")}>N</button> <br />
-                      <button className="control-button" onClick={(event: MouseEvent | TouchEvent) => onControlClick(event, "KeyP")}>P</button>
+                      <button className="control-button" onClick={(event: MouseEvent | TouchEvent) => onControlClick(event, "KeyP")}>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="25px" viewBox="0 0 24 24" width="25px" fill="gray"><path /><path d="M12 7.77L18.39 18H5.61L12 7.77M12 4L2 20h20L12 4z" /></svg>
+                      </button><br />
+                      <button className="control-button" onClick={(event: MouseEvent | TouchEvent) => onControlClick(event, "KeyY")} style={{ marginRight: "40px" }} >
+                        <svg xmlns="http://www.w3.org/2000/svg" height="25px" viewBox="0 0 24 24" width="25px" fill="gray"><path /><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" /></svg>
+                      </button>
+                      <button className="control-button" onClick={(event: MouseEvent | TouchEvent) => onControlClick(event, "KeyN")}>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="25px" viewBox="0 0 24 24" width="25px" fill="gray"><path /><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" /></svg>
+                      </button> <br />
+                      <button className="control-button" onClick={(event: MouseEvent | TouchEvent) => onControlClick(event, "Space")}>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="25px" viewBox="0 0 24 24" width="25px" fill="gray"><path /><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg>
+                      </button>
                     </div>
                     <div className="control-button-container-left">
-                      <button className=" control-button" onTouchStart={(event) => onControlStart(event, "KeyW")} onTouchEnd={(event) => onControlEnd(event, "KeyW")}>
-                        <svg viewBox="0 0 448 512" className="svg-container">
-                          <path fill="#ffffff" d="M34.9 289.5l-22.2-22.2c-9.4-9.4-9.4-24.6 0-33.9L207 39c9.4-9.4 24.6-9.4 33.9 0l194.3 194.3c9.4 9.4 9.4 24.6 0 33.9L413 289.4c-9.5 9.5-25 9.3-34.3-.4L264 168.6V456c0 13.3-10.7 24-24 24h-32c-13.3 0-24-10.7-24-24V168.6L69.2 289.1c-9.3 9.8-24.8 10-34.3.4z" />
-                        </svg>
-                      </button>
-                      <br />
-                      <button className="control-button" style={{ marginRight: "40px" }} onTouchStart={(event) => onControlStart(event, "KeyA")} onTouchEnd={(event) => onControlEnd(event, "KeyA")} >
-                        <svg viewBox="0 0 512 512" className="svg-container">
-                          <path fill="#ffffff" d="M500.33 0h-47.41a12 12 0 0 0-12 12.57l4 82.76A247.42 247.42 0 0 0 256 8C119.34 8 7.9 119.53 8 256.19 8.1 393.07 119.1 504 256 504a247.1 247.1 0 0 0 166.18-63.91 12 12 0 0 0 .48-17.43l-34-34a12 12 0 0 0-16.38-.55A176 176 0 1 1 402.1 157.8l-101.53-4.87a12 12 0 0 0-12.57 12v47.41a12 12 0 0 0 12 12h200.33a12 12 0 0 0 12-12V12a12 12 0 0 0-12-12z" />
-                        </svg>
-                      </button>
-                      <button className="control-button">
-                        <svg viewBox="0 0 512 512" className="svg-container" onTouchStart={(event) => onControlStart(event, "KeyD")} onTouchEnd={(event) => onControlEnd(event, "KeyD")} >
-                          <path fill="#ffffff" d="M212.333 224.333H12c-6.627 0-12-5.373-12-12V12C0 5.373 5.373 0 12 0h48c6.627 0 12 5.373 12 12v78.112C117.773 39.279 184.26 7.47 258.175 8.007c136.906.994 246.448 111.623 246.157 248.532C504.041 393.258 393.12 504 256.333 504c-64.089 0-122.496-24.313-166.51-64.215-5.099-4.622-5.334-12.554-.467-17.42l33.967-33.967c4.474-4.474 11.662-4.717 16.401-.525C170.76 415.336 211.58 432 256.333 432c97.268 0 176-78.716 176-176 0-97.267-78.716-176-176-176-58.496 0-110.28 28.476-142.274 72.333h98.274c6.627 0 12 5.373 12 12v48c0 6.627-5.373 12-12 12z" />
-                        </svg>
-                      </button>
-                      <br />
+                      <Joystick size={100} sticky={false} baseColor="white" stickColor="rgb(177, 177, 177)" move={onControlStart} stop={onControlEnd} ></Joystick>
                     </div>
                   </div>
-                </MobileView>
+                </MobileView >
             }
-            </div>
+            </div >
           )
         }
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
 

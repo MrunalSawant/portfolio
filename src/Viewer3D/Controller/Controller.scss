@@ -49,18 +49,6 @@ h1.loader {
   animation-delay: 0.9s;
 }
 
-.svg {
-  fill: rgb(255, 255, 255);
-}
-
-svg:hover {
-  fill: rgb(255, 255, 255);
-}
-
-svg:active {
-  fill: rgb(129, 129, 129);
-}
-
 .overlay-container {
   pointer-events: none;
   width: 100%;
@@ -84,33 +72,36 @@ svg:active {
 }
 
 .control-button-container {
+  pointer-events: all;
   position: absolute;
-  bottom: 8px;
-  width: 125px;
-  height: 125px;
+  border-radius: 50px;
+  bottom: 25px;
 }
 
 .control-button-container-right {
   @extend .control-button-container;
+  width: 125px;
+  height: 125px;
   right: 8px;
 }
 
 .control-button-container-left {
   @extend .control-button-container;
-  left: 8px;
+  width: 100px;
+  height: 100px;
+  left: 25px;
+  box-shadow: 0px 0px 15px 3px #3d3a3a;
 }
 
 .control-button {
   @extend .start-button;
-  color: #ffffff;
-  font-size: 25px;
-  font-family: cursive;
+  background-color: #ffffff;
   border: none;
-  width: 40px;
-  height: 40px;
+  padding-top: 5px;
+  padding-bottom: 4px;
   border-radius: 30px;
   border: solid 2px white;
-  box-shadow: 0px 0px 12px 1px #575757;
+  box-shadow: 0px 0px 15px 3px #3d3a3a;
 }
 
 .drag-button {

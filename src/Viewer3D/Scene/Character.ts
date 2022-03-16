@@ -4,6 +4,8 @@ import {
   AnimationMixer,
   LoopOnce,
   Scene,
+  Vector2,
+  Vector3,
 } from "three";
 
 interface CharacterAction extends AnimationAction {
@@ -92,35 +94,44 @@ class Character {
     this.act("KeyH", false);
   }
 
-  act(key: string, shiftKey: boolean) {
+  public setCharLookAtDirection(x: number, y: number) {
+    var angleRadians = Math.atan2(y - 0, x - 0);
+    characterInstance.model.setRotationFromAxisAngle(
+      new Vector3(0, 1, 0),
+      Math.PI / 2 + angleRadians
+    );
+  }
+
+  act(key: string, shiftKey?: boolean) {
     let changeAction = false;
 
     switch (key) {
-      case "KeyD":
-        characterInstance.model.rotateY(0.1);
-        break;
+      // case "KeyD":
+      //   characterInstance.model.rotateY(0.1);
+      //   break;
 
-      case "KeyA":
-        characterInstance.model.rotateY(-0.1);
-        break;
-      case "KeyS":
-        const sittingAct = characterInstance.actions.get("Walking");
-        if (!characterInstance.activeAction) {
-          characterInstance.activeAction =
-            characterInstance.actions.get("Walking");
-          changeAction = true;
-        } else if (
-          sittingAct &&
-          characterInstance.activeAction.name !== sittingAct.name
-        ) {
-          characterInstance.activeAction =
-            characterInstance.actions.get("Walking");
-          changeAction = true;
-        }
+      // case "KeyA":
+      //   characterInstance.model.rotateY(-0.1);
+      //   break;
+      // case "KeyS":
+      //   const sittingAct = characterInstance.actions.get("Walking");
+      //   if (!characterInstance.activeAction) {
+      //     characterInstance.activeAction =
+      //       characterInstance.actions.get("Walking");
+      //     changeAction = true;
+      //   } else if (
+      //     sittingAct &&
+      //     characterInstance.activeAction.name !== sittingAct.name
+      //   ) {
+      //     characterInstance.activeAction =
+      //       characterInstance.actions.get("Walking");
+      //     changeAction = true;
+      //   }
 
-        break;
+      //   break;
 
       case "KeyW":
+        // this.setCharLookAtDirection(0, 90);
         const runningAct = characterInstance.actions.get("Running");
         if (!characterInstance.activeAction) {
           characterInstance.activeAction =
