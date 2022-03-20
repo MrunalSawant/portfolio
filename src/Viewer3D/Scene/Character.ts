@@ -1,12 +1,12 @@
+/* eslint-disable no-case-declarations */
 import {
   AnimationAction,
   AnimationClip,
   AnimationMixer,
   LoopOnce,
   Scene,
-  Vector2,
-  Vector3,
-} from "three";
+  Vector3
+} from 'three';
 
 interface CharacterAction extends AnimationAction {
   name: string;
@@ -14,44 +14,51 @@ interface CharacterAction extends AnimationAction {
 
 class Character {
   private static _instance: Character;
+
   public model!: Scene;
+
   public mixer!: AnimationMixer;
+
   public actions: Map<string, CharacterAction> = new Map<
     string,
     CharacterAction
   >();
+
   public activeAction: CharacterAction | undefined;
+
   public previousAction: CharacterAction | undefined;
+
   public duration = 0.5;
 
-  public static get Instance() {
+  public static get Instance():Character {
     // Do you need arguments? Make it a regular static method instead.
+    // eslint-disable-next-line no-return-assign
     return this._instance || (this._instance = new this());
   }
 
-  public init(model: Scene) {
+  public init(model: Scene): void {
     Character._instance.model = model;
     Character._instance.model.scale.set(0.5, 0.5, 0.5);
     // HACK to move char to camera center
     // Character._instance.model.children[0].translateY(-2);
   }
 
-  public loadAnimation(animations: Array<AnimationClip>) {
-    const model = Character._instance.model;
+  public loadAnimation(animations: Array<AnimationClip>): void {
+    const { model } = Character._instance;
     const states = [
-      "Idle",
-      "Walking",
-      "Running",
-      "Dance",
-      "Death",
-      "Sitting",
-      "Standing",
+      'Idle',
+      'Walking',
+      'Running',
+      'Dance',
+      'Death',
+      'Sitting',
+      'Standing'
     ];
-    const emotes = ["Jump", "Yes", "No", "Wave", "Punch", "ThumbsUp"];
+    const emotes = ['Jump', 'Yes', 'No', 'Wave', 'Punch', 'ThumbsUp'];
 
     Character._instance.mixer = new AnimationMixer(model);
 
-    for (let i = 0; i < animations.length; i++) {
+    for (let i = 0; i < animations.length; i += 1) {
       const clip = animations[i];
       const action = Character._instance.mixer.clipAction(
         clip
@@ -65,142 +72,116 @@ class Character {
     }
   }
 
-  stopAct(key: string, shiftKey: boolean) {
+  stopAct(key: string): void {
     switch (key) {
-      case "KeyW":
+      case 'KeyW':
         // const walkingAct = characterInstance.actions.get("Running");
-        const runningAct = characterInstance.actions.get("Running");
-        if (characterInstance.activeAction && runningAct) {
-          if (characterInstance.activeAction.name === runningAct!.name) {
-            characterInstance.activeAction.stop();
-            characterInstance.activeAction = undefined;
+        const runningAct = Character.Instance.actions.get('Running');
+        if (Character.Instance.activeAction && runningAct) {
+          if (Character.Instance.activeAction.name === runningAct!.name) {
+            Character.Instance.activeAction.stop();
+            Character.Instance.activeAction = undefined;
           }
         }
         break;
 
-      case "KeyS":
-        const walkingAct = characterInstance.actions.get("Walking");
-        if (characterInstance.activeAction && walkingAct) {
-          if (characterInstance.activeAction.name === walkingAct!.name) {
-            characterInstance.activeAction.stop();
-            characterInstance.activeAction = undefined;
+      case 'KeyS':
+        const walkingAct = Character.Instance.actions.get('Walking');
+        if (Character.Instance.activeAction && walkingAct) {
+          if (Character.Instance.activeAction.name === walkingAct!.name) {
+            Character.Instance.activeAction.stop();
+            Character.Instance.activeAction = undefined;
           }
         }
         break;
+      default:
     }
   }
 
-  public sayHello() {
-    this.act("KeyH", false);
+  public sayHello():void {
+    this.act('KeyH');
   }
 
-  public setCharLookAtDirection(x: number, y: number) {
-    var angleRadians = Math.atan2(y - 0, x - 0);
-    characterInstance.model.setRotationFromAxisAngle(
+  public setCharLookAtDirection(x: number, y: number):void {
+    const angleRadians = Math.atan2(y - 0, x - 0);
+    Character.Instance.model.setRotationFromAxisAngle(
       new Vector3(0, 1, 0),
       Math.PI / 2 + angleRadians
     );
   }
 
-  act(key: string, shiftKey?: boolean) {
+  act(key: string):void {
     let changeAction = false;
 
     switch (key) {
-      // case "KeyD":
-      //   characterInstance.model.rotateY(0.1);
-      //   break;
-
-      // case "KeyA":
-      //   characterInstance.model.rotateY(-0.1);
-      //   break;
-      // case "KeyS":
-      //   const sittingAct = characterInstance.actions.get("Walking");
-      //   if (!characterInstance.activeAction) {
-      //     characterInstance.activeAction =
-      //       characterInstance.actions.get("Walking");
-      //     changeAction = true;
-      //   } else if (
-      //     sittingAct &&
-      //     characterInstance.activeAction.name !== sittingAct.name
-      //   ) {
-      //     characterInstance.activeAction =
-      //       characterInstance.actions.get("Walking");
-      //     changeAction = true;
-      //   }
-
-      //   break;
-
-      case "KeyW":
+      case 'KeyW':
         // this.setCharLookAtDirection(0, 90);
-        const runningAct = characterInstance.actions.get("Running");
-        if (!characterInstance.activeAction) {
-          characterInstance.activeAction =
-            characterInstance.actions.get("Running");
+        const runningAct = Character.Instance.actions.get('Running');
+        if (!Character.Instance.activeAction) {
+          Character.Instance.activeAction = Character.Instance.actions.get('Running');
           changeAction = true;
         } else if (
-          runningAct &&
-          characterInstance.activeAction.name !== runningAct.name
+          runningAct && Character.Instance.activeAction.name !== runningAct.name
         ) {
-          characterInstance.activeAction =
-            characterInstance.actions.get("Running");
+          Character.Instance.activeAction = Character.Instance.actions.get('Running');
           changeAction = true;
         }
 
         break;
-      case "Space":
-        characterInstance.activeAction = characterInstance.actions.get("Jump");
+      case 'Space':
+        Character.Instance.activeAction = Character.Instance.actions.get('Jump');
         changeAction = true;
         break;
 
-      case "KeyY":
-        characterInstance.activeAction = characterInstance.actions.get("Yes");
+      case 'KeyY':
+        Character.Instance.activeAction = Character.Instance.actions.get('Yes');
         changeAction = true;
         break;
 
-      case "KeyN":
-        characterInstance.activeAction = characterInstance.actions.get("No");
+      case 'KeyN':
+        Character.Instance.activeAction = Character.Instance.actions.get('No');
         changeAction = true;
         break;
 
-      case "KeyH":
-        characterInstance.activeAction = characterInstance.actions.get("Wave");
+      case 'KeyH':
+        Character.Instance.activeAction = Character.Instance.actions.get('Wave');
         changeAction = true;
         break;
 
-      case "KeyK":
-        characterInstance.activeAction = characterInstance.actions.get("Death");
+      case 'KeyK':
+        Character.Instance.activeAction = Character.Instance.actions.get('Death');
         changeAction = true;
         break;
 
-      case "KeyT":
-        characterInstance.activeAction =
-          characterInstance.actions.get("ThumbsUp");
+      case 'KeyT':
+        Character.Instance.activeAction = Character.Instance.actions.get('ThumbsUp');
         changeAction = true;
         break;
 
-      case "KeyP":
-        characterInstance.activeAction = characterInstance.actions.get("Punch");
+      case 'KeyP':
+        Character.Instance.activeAction = Character.Instance.actions.get('Punch');
         changeAction = true;
         break;
+      default:
     }
 
     if (changeAction) {
       if (
-        characterInstance.previousAction &&
-        characterInstance.previousAction !== characterInstance.activeAction
+        Character.Instance.previousAction && Character.Instance.previousAction !== Character.Instance.activeAction
       ) {
-        characterInstance.previousAction.fadeOut(characterInstance.duration);
+        Character.Instance.previousAction.fadeOut(Character.Instance.duration);
       }
 
-      if (characterInstance.activeAction)
-        characterInstance.activeAction
+      if (Character.Instance.activeAction) {
+        Character.Instance.activeAction
           .reset()
           .setEffectiveTimeScale(1)
           .setEffectiveWeight(1)
           .fadeIn(0.2)
           .play();
+      }
 
-      characterInstance.previousAction = characterInstance.activeAction;
+      Character.Instance.previousAction = Character.Instance.activeAction;
     }
   }
 }

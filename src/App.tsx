@@ -1,9 +1,8 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { ReactElement } from 'react';
 import './App.css';
 import { Viewer } from './Viewer3D/Viewer';
 
-function App() {
+function App(): ReactElement {
   return (
     <div className="App">
       <Viewer />

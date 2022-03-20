@@ -14,6 +14,7 @@
     "react": "^17.0.2",
     "react-device-detect": "^2.1.2",
     "react-dom": "^17.0.2",
+    "react-joystick-component": "^4.0.0",
     "react-scripts": "5.0.0",
     "sass": "^1.49.9",
     "three": "^0.137.5",
@@ -24,7 +25,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint src/*",
+    "lint:fix": "eslint src/* --fix",
+    "lint:quiet": "eslint src/* --quiet"
   },
   "eslintConfig": {
     "extends": [
@@ -45,6 +49,15 @@
     ]
   },
   "devDependencies": {
-    "@types/three": "^0.137.0"
+    "@types/three": "^0.137.0",
+    "@typescript-eslint/eslint-plugin": "^5.15.0",
+    "@typescript-eslint/parser": "^5.15.0",
+    "eslint": "^8.11.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-import-resolver-typescript": "^2.5.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.29.4",
+    "eslint-plugin-react-hooks": "^4.3.0"
   }
 }

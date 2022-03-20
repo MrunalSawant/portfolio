@@ -1,17 +1,17 @@
-import { Mesh, Scene } from "three";
+import { Mesh, Scene } from 'three';
 
-let woodBox: Mesh = new Mesh();
-let wineBox: Mesh = new Mesh();
-let treesTypeA: Array<Mesh> = [];
-let treesTypeB: Array<Mesh> = [];
-let treesTypeC: Array<Mesh> = [];
-let house: Array<Scene> = [];
-let rocks: Array<Mesh> = [];
-let flowers: Array<Mesh> = [];
-let grass: Mesh = new Mesh();
-let leaf: Array<Mesh> = [];
-let barricades: Array<Mesh> = [];
-let grassField: Scene = new Scene();
+const woodBox: Mesh = new Mesh();
+const wineBox: Mesh = new Mesh();
+const treesTypeA: Array<Mesh> = [];
+const treesTypeB: Array<Mesh> = [];
+const treesTypeC: Array<Mesh> = [];
+const house: Array<Scene> = [];
+const rocks: Array<Mesh> = [];
+const flowers: Array<Mesh> = [];
+const grass: Mesh = new Mesh();
+const leaf: Array<Mesh> = [];
+const barricades: Array<Mesh> = [];
+const grassField: Scene = new Scene();
 
 export {
   woodBox,
@@ -25,5 +25,5 @@ export {
   leaf,
   barricades,
   grass,
-  grassField,
+  grassField
 };

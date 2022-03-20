@@ -8,25 +8,32 @@ import {
   Mesh,
   Quaternion,
   Scene,
-  Vector3,
-} from "three";
-import { ModelManager } from "../ModelManager";
-import { characterInstance } from "./Character";
-import { createMainLight, createShadowLight } from "./Lights";
-import { shadowInstance } from "./Shadow";
+  Vector3
+} from 'three';
+import { characterInstance } from './Character';
+import { createMainLight, createShadowLight } from './Lights';
+import { shadowInstance } from './Shadow';
 
 class SceneManager {
   private _scene!: Scene;
+
   private static _instance: SceneManager;
+
   public floor!: Mesh;
+
   public mainLight!: Light;
+
   public shadowLight!: Light;
+
   public character!: Mesh;
+
   public modelMap: Map<string, Scene> = new Map();
+
   public grasField: Scene = new Scene();
+
   public Ammo: any;
 
-  public static get Instance() {
+  public static get Instance(): SceneManager {
     if (this._instance) {
       return this._instance;
     }
@@ -67,43 +74,39 @@ class SceneManager {
   //   // tempBtVec3_1 = new this.Ammo.btVector3(0, 0, 0);
   // }
 
-  setEventCallback() {
-    document.onkeydown = function (event: KeyboardEvent) {
-      characterInstance.act(event.code, event.shiftKey);
+  setEventCallback(): void {
+    document.onkeydown = (event: KeyboardEvent): void => {
+      characterInstance.act(event.code);
     };
 
-    document.onkeyup = function (event: KeyboardEvent) {
-      characterInstance.stopAct(event.code, event.shiftKey);
+    document.onkeyup = (event: KeyboardEvent): void => {
+      characterInstance.stopAct(event.code);
       event.preventDefault();
-    };
-
-    document.onmousedown = function (event: MouseEvent) {
-      // Punch on mouse click
     };
   }
 
-  async initScene(scene: Scene) {
+  async initScene(scene: Scene): Promise<void> {
     await shadowInstance.init();
     SceneManager.Instance._scene = scene;
-    const modelManager = new ModelManager();
     SceneManager.Instance.setEventCallback();
     SceneManager.Instance.mainLight = createMainLight();
     SceneManager.Instance.shadowLight = createShadowLight();
-    await modelManager.loadAndStoreModels();
   }
 
-  async physics() {}
+  async physics(): Promise<void> {
+    // fghfgh
+  }
 
-  start() {
-    this._scene.add(sceneInstance.mainLight);
-    this._scene.add(sceneInstance.shadowLight);
+  start(): void {
+    this._scene.add(SceneManager._instance.mainLight);
+    this._scene.add(SceneManager._instance.shadowLight);
     this._scene.add(characterInstance.model);
     characterInstance.sayHello();
-    sceneInstance.modelMap.forEach((scene: Scene, key: string) => {
-      sceneInstance.setRandomPosition(scene);
-      this._scene.add(scene);
-    });
-    //this.loadGrass(this.grasField);
+    // sceneInstance.modelMap.forEach((scene: Scene, key: string) => {
+    //   sceneInstance.setRandomPosition(scene);
+    //   this._scene.add(scene);
+    // });
+    // this.loadGrass(this.grasField);
     // this.addRoad();
 
     // const house1 = sceneInstance.modelMap.get("house1");
@@ -123,7 +126,7 @@ class SceneManager {
     this._scene.add(shadowInstance.shadowGroup);
   }
 
-  addRoad() {
+  addRoad(): void {
     const mainBarricadeWall1: Scene = new Scene();
     const mainBarricadeWall2: Scene = new Scene();
 
@@ -140,21 +143,26 @@ class SceneManager {
     this._scene.add(mainBarricadeWall2);
   }
 
-  loadGrass(scene: Scene) {
-    const grass1 = sceneInstance.modelMap.get("grass1");
+  loadGrass(scene: Scene): void {
+    const grass1 = SceneManager._instance.modelMap.get('grass1');
     if (grass1) {
-      const geometry = (grass1.children[0] as Mesh).geometry;
-      const material = (grass1.children[0] as Mesh).material;
+      const { geometry } = grass1.children[0] as Mesh;
+      const { material } = grass1.children[0] as Mesh;
 
-      sceneInstance.makeInstanceOnXZPlane(geometry, material, 100, scene);
+      SceneManager._instance.makeInstanceOnXZPlane(
+        geometry,
+        material,
+        100,
+        scene
+      );
     }
   }
 
-  loadBarricades(scene: Scene) {
-    const barricade1 = sceneInstance.modelMap.get("barricade1");
-    const barricade2 = sceneInstance.modelMap.get("barricade2");
-    const barricade3 = sceneInstance.modelMap.get("barricade3");
-    const barricade4 = sceneInstance.modelMap.get("barricade4");
+  loadBarricades(scene: Scene): void {
+    const barricade1 = SceneManager._instance.modelMap.get('barricade1');
+    const barricade2 = SceneManager._instance.modelMap.get('barricade2');
+    const barricade3 = SceneManager._instance.modelMap.get('barricade3');
+    const barricade4 = SceneManager._instance.modelMap.get('barricade4');
 
     if (barricade1 && barricade2 && barricade3 && barricade4) {
       const geometry1 = (barricade1.children[0] as Mesh).geometry;
@@ -164,7 +172,7 @@ class SceneManager {
       const geometry4 = (barricade4.children[0] as Mesh).geometry;
       const material4 = (barricade4.children[0] as Mesh).material;
 
-      sceneInstance.makeInstanceOnStraightLine(
+      SceneManager._instance.makeInstanceOnStraightLine(
         [geometry1, geometry4, geometry3, geometry4],
         [material1, material4, material3, material4],
         30,
@@ -173,7 +181,7 @@ class SceneManager {
     }
   }
 
-  setRandomPosition(scene: Scene) {
+  setRandomPosition(scene: Scene): void {
     scene.position.x = 10 + Math.random() * 100;
     scene.position.z = 10 + Math.random() * 100;
   }
@@ -183,13 +191,13 @@ class SceneManager {
     material: Array<Material | Material[]>,
     count: number,
     scene: Scene
-  ) {
+  ): void {
     if (geometry.length !== material.length) {
       return;
     }
     const meshArray: Array<InstancedMesh> = [];
 
-    for (let i = 0; i < geometry.length; ++i) {
+    for (let i = 0; i < geometry.length; i += 1) {
       const mesh = new InstancedMesh(geometry[i], material[i], count);
       mesh.receiveShadow = true;
       mesh.castShadow = true;
@@ -201,12 +209,12 @@ class SceneManager {
     const quaternion = new Quaternion();
     const scale = new Vector3();
 
-    const xzMatrixOnStraight = function (
+    const xzMatrixOnStraight = (
       matrix: Matrix4,
       indexX: number,
       zRotation: number,
       newScale: Vector3
-    ): void {
+    ): void => {
       position.x = indexX * 1.9;
       position.y = 0.8;
       rotation.z = zRotation;
@@ -217,13 +225,10 @@ class SceneManager {
       matrix.compose(position, quaternion, scale);
     };
 
-    for (let i = 0; i < count; i++) {
-      let random = Math.floor(Math.random() * 4);
-      console.log(random);
+    for (let i = 0; i < count; i += 1) {
+      const random = Math.floor(Math.random() * 4);
       const matrix = new Matrix4();
-
       xzMatrixOnStraight(matrix, i, Math.PI, new Vector3(0.05, 0.5, 0.05));
-
       meshArray[random].setMatrixAt(i, matrix);
     }
 
@@ -235,7 +240,7 @@ class SceneManager {
     material: Material | Material[],
     count: number,
     scene: Scene
-  ) {
+  ): void {
     const matrix = new Matrix4();
     const mesh = new InstancedMesh(geometry, material, count * count);
     mesh.receiveShadow = false;
@@ -246,12 +251,12 @@ class SceneManager {
     const quaternion = new Quaternion();
     const scale = new Vector3();
 
-    const xzMatrixOnPlane = function (
-      matrix: Matrix4,
+    const xzMatrixOnPlane = (
+      xzMatrix: Matrix4,
       indexX: number,
       indexZ: number,
       newScale: Vector3
-    ): void {
+    ): void => {
       position.x = indexX * 1.2;
       position.z = indexZ * 1.2;
       rotation.z = Math.PI;
@@ -260,11 +265,11 @@ class SceneManager {
       scale.x = newScale.x;
       scale.z = newScale.z;
       scale.y = newScale.y;
-      matrix.compose(position, quaternion, scale);
+      xzMatrix.compose(position, quaternion, scale);
     };
 
-    for (let i = 0; i < count; i++) {
-      for (let j = 0; j < count; j++) {
+    for (let i = 0; i < count; i += 1) {
+      for (let j = 0; j < count; j += 1) {
         xzMatrixOnPlane(matrix, i, j, new Vector3(0.05, 0.9, 0.05));
 
         mesh.setMatrixAt(Number(i * 16 + j), matrix);

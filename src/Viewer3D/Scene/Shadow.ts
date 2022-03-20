@@ -1,3 +1,4 @@
+/* eslint-disable no-tabs */
 import {
   Group,
   Mesh,
@@ -7,32 +8,42 @@ import {
   PlaneGeometry,
   ShaderMaterial,
   WebGLRenderer,
-  WebGLRenderTarget,
-} from "three";
+  WebGLRenderTarget
+} from 'three';
 
-import { HorizontalBlurShader } from "../../lib/HorizontalBlurShader.js";
-import { VerticalBlurShader } from "../../lib/VerticalBlurShader.js";
+import { HorizontalBlurShader } from '../../lib/HorizontalBlurShader.js';
+import { VerticalBlurShader } from '../../lib/VerticalBlurShader.js';
 
 class Shadow {
   private static _instance: Shadow;
 
   public horizontalBlurMaterial!: ShaderMaterial;
+
   public verticalBlurMaterial!: ShaderMaterial;
+
   public renderTarget!: WebGLRenderTarget;
+
   public renderTargetBlur!: WebGLRenderTarget;
+
   public shadowCamera!: OrthographicCamera;
+
   public plane!: Mesh;
+
   public shadowGroup!: Group;
+
   public blurPlane!: Mesh;
+
   public fillPlane!: Mesh;
+
   public depthMaterial!: MeshDepthMaterial;
 
-  public static get Instance() {
+  public static get Instance(): Shadow {
     // Do you need arguments? Make it a regular static method instead.
+    // eslint-disable-next-line no-return-assign
     return this._instance || (this._instance = new this());
   }
 
-  init() {
+  init() : void {
     Shadow._instance.renderTarget = new WebGLRenderTarget(512, 512);
     Shadow._instance.renderTarget.texture.generateMipmaps = false;
 
@@ -50,7 +61,7 @@ class Shadow {
       map: Shadow._instance.renderTarget.texture,
       opacity: 0.6,
       transparent: true,
-      depthWrite: false,
+      depthWrite: false
     });
 
     Shadow._instance.shadowGroup = new Group();
@@ -70,10 +81,10 @@ class Shadow {
 
     // the plane with the color of the ground
     const fillPlaneMaterial = new MeshBasicMaterial({
-      color: "#ffffff",
+      color: '#ffffff',
       opacity: 0,
       transparent: true,
-      depthWrite: false,
+      depthWrite: false
     });
 
     Shadow._instance.fillPlane = new Mesh(planeGeometry, fillPlaneMaterial);
@@ -96,17 +107,16 @@ class Shadow {
     // like MeshDepthMaterial, but goes from black to transparent
     Shadow._instance.depthMaterial = new MeshDepthMaterial();
     Shadow._instance.depthMaterial.userData.darkness = {
-      value: 5,
+      value: 5
     };
     Shadow._instance.depthMaterial.onBeforeCompile = function (shader) {
-      shader.uniforms.darkness =
-        Shadow._instance.depthMaterial.userData.darkness;
+      shader.uniforms.darkness = Shadow._instance.depthMaterial.userData.darkness;
       shader.fragmentShader = /* glsl */ `
 						uniform float darkness;
 						${shader.fragmentShader.replace(
-              "gl_FragColor = vec4( vec3( 1.0 - fragCoordZ ), opacity );",
-              "gl_FragColor = vec4( vec3( 0.0 ), ( 1.0 - fragCoordZ ) * darkness );"
-            )}
+    'gl_FragColor = vec4( vec3( 1.0 - fragCoordZ ), opacity );',
+    'gl_FragColor = vec4( vec3( 0.0 ), ( 1.0 - fragCoordZ ) * darkness );'
+  )}
 					`;
     };
 
@@ -123,27 +133,23 @@ class Shadow {
     Shadow._instance.verticalBlurMaterial.depthTest = false;
   }
 
-  blurShadow = function (amount: number, renderer: WebGLRenderer): void {
+  blurShadow = (amount: number, renderer: WebGLRenderer): void => {
     Shadow._instance.blurPlane.visible = true;
 
     // blur horizontally and draw in the renderTargetBlur
-    Shadow._instance.blurPlane.material =
-      Shadow.Instance.horizontalBlurMaterial;
+    Shadow._instance.blurPlane.material = Shadow.Instance.horizontalBlurMaterial;
 
-    //@ts-ignore uniforms
-    Shadow._instance.blurPlane.material.uniforms.tDiffuse.value =
-      Shadow._instance.renderTarget.texture;
-    Shadow.Instance.horizontalBlurMaterial.uniforms.h.value =
-      (amount * 1) / 256;
+    // @ts-ignore uniforms
+    Shadow._instance.blurPlane.material.uniforms.tDiffuse.value = Shadow._instance.renderTarget.texture;
+    Shadow.Instance.horizontalBlurMaterial.uniforms.h.value = (amount * 1) / 256;
 
     renderer.setRenderTarget(Shadow.Instance.renderTargetBlur);
     renderer.render(Shadow._instance.blurPlane, Shadow.Instance.shadowCamera);
 
     // blur vertically and draw in the main renderTarget
     Shadow._instance.blurPlane.material = Shadow.Instance.verticalBlurMaterial;
-    //@ts-ignore uniforms
-    Shadow._instance.blurPlane.material.uniforms.tDiffuse.value =
-      Shadow.Instance.renderTargetBlur.texture;
+    // @ts-ignore uniforms
+    Shadow._instance.blurPlane.material.uniforms.tDiffuse.value = Shadow.Instance.renderTargetBlur.texture;
     Shadow.Instance.verticalBlurMaterial.uniforms.v.value = (amount * 1) / 256;
 
     renderer.setRenderTarget(Shadow.Instance.renderTarget);
