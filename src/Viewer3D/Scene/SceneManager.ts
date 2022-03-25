@@ -12,7 +12,7 @@ import {
 } from 'three';
 import { characterInstance } from './Character';
 import { createMainLight, createShadowLight } from './Lights';
-import { shadowInstance } from './Shadow';
+// import { shadowInstance } from './Shadow';
 
 class SceneManager {
   private _scene!: Scene;
@@ -86,7 +86,7 @@ class SceneManager {
   }
 
   async initScene(scene: Scene): Promise<void> {
-    await shadowInstance.init();
+    // await shadowInstance.init();
     SceneManager.Instance._scene = scene;
     SceneManager.Instance.setEventCallback();
     SceneManager.Instance.mainLight = createMainLight();
@@ -100,30 +100,31 @@ class SceneManager {
   start(): void {
     this._scene.add(SceneManager._instance.mainLight);
     this._scene.add(SceneManager._instance.shadowLight);
+    // characterInstance.model.position.y = -50;
     this._scene.add(characterInstance.model);
     characterInstance.sayHello();
-    // sceneInstance.modelMap.forEach((scene: Scene, key: string) => {
-    //   sceneInstance.setRandomPosition(scene);
-    //   this._scene.add(scene);
-    // });
-    // this.loadGrass(this.grasField);
-    // this.addRoad();
+    SceneManager.Instance.modelMap.forEach((scene: Scene) => {
+      SceneManager.Instance.setRandomPosition(scene);
+      this._scene.add(scene);
+    });
+    this.loadGrass(this.grasField);
+    this.addRoad();
 
-    // const house1 = sceneInstance.modelMap.get("house1");
-    // if (house1) {
-    //   house1.castShadow = false;
-    //   house1.receiveShadow = false;
-    //   house1.position.z = -10;
-    //   //sceneInstance.setRandomPosition(house1);
-    //   this._scene.add(house1);
-    // }
-    // const house2 = sceneInstance.modelMap.get("treeh1");
-    // if (house2) {
-    //   house1.castShadow = false;
-    //   sceneInstance.setRandomPosition(house2);
-    //   this._scene.add(house2);
-    // }
-    this._scene.add(shadowInstance.shadowGroup);
+    const house1 = SceneManager.Instance.modelMap.get('house1');
+    if (house1) {
+      house1.castShadow = false;
+      house1.receiveShadow = false;
+      house1.position.z = -10;
+      // sceneInstance.setRandomPosition(house1);
+      this._scene.add(house1);
+    }
+    const house2 = SceneManager.Instance.modelMap.get('treeh1');
+    if (house2) {
+      house1.castShadow = false;
+      SceneManager.Instance.setRandomPosition(house2);
+      this._scene.add(house2);
+    }
+    // this._scene.add(shadowInstance.shadowGroup);
   }
 
   addRoad(): void {

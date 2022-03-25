@@ -82,7 +82,7 @@ class Shadow {
     // the plane with the color of the ground
     const fillPlaneMaterial = new MeshBasicMaterial({
       color: '#ffffff',
-      opacity: 0,
+      opacity: 0.5,
       transparent: true,
       depthWrite: false
     });

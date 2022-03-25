@@ -103,6 +103,7 @@ class Character {
   }
 
   public setCharLookAtDirection(x: number, y: number):void {
+    if (!Character.Instance.model) return;
     const angleRadians = Math.atan2(y - 0, x - 0);
     Character.Instance.model.setRotationFromAxisAngle(
       new Vector3(0, 1, 0),

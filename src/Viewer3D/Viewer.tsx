@@ -3,13 +3,17 @@ import React, { ReactElement } from 'react';
 import {
   Clock, PerspectiveCamera, Scene, sRGBEncoding, Vector3, WebGLRenderer
 } from 'three';
+// import {
+//   Body,
+//   Box, NaiveBroadphase, Plane, Vec3, World
+// } from 'cannon-es';
 import { TrackballControls } from '../lib/TrackballControls.js';
 import Controller from './Controller/Controller';
 import { characterInstance } from './Scene/Character';
 import { sceneInstance } from './Scene/SceneManager';
-import { shadowInstance } from './Scene/Shadow';
+// import { shadowInstance } from './Scene/Shadow';
 
-import CANNON from '../lib/cannon.js';
+// import CANNON from '../lib/cannon.js';
 import './Viewer.scss';
 import { ModelManager } from './ModelManager';
 
@@ -22,11 +26,11 @@ export class Viewer extends React.Component {
 
   private _scene!: Scene;
 
-  private _world!: any;
+  // private _world!: any;
 
-  private _shape!: any;
+  // private _shape!: any;
 
-  private _body!: any;
+  // private _body!: any;
 
   private _camera!: PerspectiveCamera;
 
@@ -81,7 +85,7 @@ export class Viewer extends React.Component {
     await modelManager.loadAndStoreModels();
 
     this.animate();
-    this.initCannon();
+    // this.initCannon();
 
     if (sceneInstance) {
       await sceneInstance.initScene(this._scene);
@@ -105,7 +109,7 @@ export class Viewer extends React.Component {
         rotation.applyEuler(characterInstance.model.rotation);
         const movement = rotation.clone().multiplyScalar(dt * 6);
         characterInstance.model.position.add(movement);
-        shadowInstance.shadowGroup.position.add(movement);
+        // shadowInstance.shadowGroup.position.add(movement);
         const distance = this._camera.position.distanceTo(this._trackballControls.target);
         const newCameraPostion = characterInstance.model.position.clone().add(this._postionToTargetDirection.clone().multiplyScalar(distance));
         this._camera.position.copy(newCameraPostion);
@@ -150,29 +154,45 @@ export class Viewer extends React.Component {
     requestAnimationFrame(this.animate.bind(this));
     this._trackballControls.update();
     this._renderer.render(this._scene, this._camera);
+    // if (this.state.isStarted) { this._updatePhysics(); }
   }
 
-  initCannon() : void {
-    // @ts-ignore
-    this._world = new CANNON.World();
-    console.log(this._world);
-    this._world.gravity.set(0, 0, 0);
-    // @ts-ignore
-    this._world.broadphase = new CANNON.NaiveBroadphase();
-    this._world.solver.iterations = 10;
+  // initCannon() : void {
+  //   this._world = new World({
+  //     gravity: new Vec3(0, -9.82, 0) // m/s²
+  //   });
+  //   this._world.broadphase = new NaiveBroadphase();
+  //   this._world.solver.iterations = 10;
 
-    // @ts-ignore
-    this._shape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
-    // mass = 1;
-    // @ts-ignore
-    this._body = new CANNON.Body({
-      mass: 1
-    });
-    this._body.addShape(this._shape);
-    this._body.angularVelocity.set(0, 10, 0);
-    this._body.angularDamping = 0.5;
-    this._world.addBody(this._body);
-  }
+  //   this._shape = new Box(new Vec3(1, 1, 1));
+  //   this._body = new Body({
+  //     mass: 10
+  //   });
+  //   this._body.addShape(this._shape);
+  //   this._body.angularVelocity.set(0, -10, 0);
+  //   this._body.angularDamping = 0.5;
+  //   this._world.addBody(this._body);
+
+  //   const groundShape = new Plane();
+  //   const groundBody = new Body({ mass: 0 });
+  //   groundBody.addShape(groundShape);
+  //   groundBody.quaternion.setFromAxisAngle(new Vec3(1, 0, 0), -Math.PI / 2);
+  //   this._world.addBody(groundBody);
+  // }
+
+  // private _updatePhysics(): void {
+  //   // Step the physics world
+
+  //   if (this._world) {
+  //     this._world.step(1 / 60);
+  //   }
+
+  //   // Copy coordinates from Cannon.js to Three.js
+  //   if (characterInstance.model) {
+  //     characterInstance.model.position.copy(this._body.position);
+  //     // characterInstance.model.quaternion.copy(this._body.quaternion);
+  //   }
+  // }
 
   render(): ReactElement {
     return (
